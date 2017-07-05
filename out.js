@@ -6915,15 +6915,39 @@
           if (t2 > t3)
             t1.pop();
           t1 = this._headPosition;
-          t2 = this._foodPosition;
-          dx = t1.x - t2.x;
-          dy = t1.y - t2.y;
-          if (dx * dx + dy * dy <= 100) {
-            t1 = this._bodyLength;
-            if (typeof t1 !== "number")
-              return t1.$add();
-            this._bodyLength = t1 + 50;
-            this._foodPosition = G.randomPoint(J.get$width$x($.canvas), J.get$height$x($.canvas));
+          t2 = t1.x;
+          if (!(t2 < 0))
+            if (!(t1.y < 0)) {
+              t1 = J.get$width$x($.canvas);
+              if (typeof t1 !== "number")
+                return H.iae(t1);
+              if (!(t2 >= t1)) {
+                t1 = this._headPosition.y;
+                t2 = J.get$height$x($.canvas);
+                if (typeof t2 !== "number")
+                  return H.iae(t2);
+                t2 = t1 >= t2;
+                t1 = t2;
+              } else
+                t1 = true;
+            } else
+              t1 = true;
+          else
+            t1 = true;
+          if (t1)
+            this.init$0();
+          else {
+            t1 = this._headPosition;
+            t2 = this._foodPosition;
+            dx = t1.x - t2.x;
+            dy = t1.y - t2.y;
+            if (dx * dx + dy * dy <= 100) {
+              t1 = this._bodyLength;
+              if (typeof t1 !== "number")
+                return t1.$add();
+              this._bodyLength = t1 + 50;
+              this._foodPosition = G.randomPoint(J.get$width$x($.canvas), J.get$height$x($.canvas));
+            }
           }
           this._needsDraw = true;
         }

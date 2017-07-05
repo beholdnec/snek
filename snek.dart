@@ -140,8 +140,16 @@ class Game {
         _bodyPoints.removeLast();
       }
 
+      // check for wall collision
+      if (_headPosition.x < 0 || _headPosition.y < 0 ||
+        _headPosition.x >= canvas.width || _headPosition.y >= canvas.height) {
+        // out of bounds; reset the game
+        // TODO: carefully ensure game state is cleaned up and reset; abort
+        // the current update
+        init();
+      }
       // check for food collision
-      if (_headPosition.squaredDistanceTo(_foodPosition) <= (FOOD_DIAMETER/2)*(FOOD_DIAMETER/2)) {
+      else if (_headPosition.squaredDistanceTo(_foodPosition) <= (FOOD_DIAMETER/2)*(FOOD_DIAMETER/2)) {
         // collision detected; eat the food
         _bodyLength += BODY_PER_FOOD;
         _placeFood();

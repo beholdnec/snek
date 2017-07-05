@@ -906,6 +906,52 @@
         return this.toList$1$growable($receiver, true);
       }
     },
+    SubListIterable: {
+      "^": "ListIterable;_iterable,_start,_endOrLength,$ti",
+      get$_endIndex: function() {
+        var $length = J.get$length$asx(this._iterable);
+        return $length;
+      },
+      get$_startIndex: function() {
+        var $length, t1;
+        $length = J.get$length$asx(this._iterable);
+        t1 = this._start;
+        if (t1 > $length)
+          return $length;
+        return t1;
+      },
+      get$length: function(_) {
+        var $length, t1;
+        $length = J.get$length$asx(this._iterable);
+        t1 = this._start;
+        if (t1 >= $length)
+          return 0;
+        return $length - t1;
+      },
+      elementAt$1: function(_, index) {
+        var realIndex, t1;
+        realIndex = this.get$_startIndex() + index;
+        if (index >= 0) {
+          t1 = this.get$_endIndex();
+          if (typeof t1 !== "number")
+            return H.iae(t1);
+          t1 = realIndex >= t1;
+        } else
+          t1 = true;
+        if (t1)
+          throw H.wrapException(P.IndexError$(index, this, "index", null, null));
+        return J.elementAt$1$ax(this._iterable, realIndex);
+      },
+      SubListIterable$3: function(_iterable, _start, _endOrLength, $E) {
+      },
+      static: {
+        SubListIterable$: function(_iterable, _start, _endOrLength, $E) {
+          var t1 = new H.SubListIterable(_iterable, _start, _endOrLength, [$E]);
+          t1.SubListIterable$3(_iterable, _start, _endOrLength, $E);
+          return t1;
+        }
+      }
+    },
     ListIterator: {
       "^": "Object;_iterable,__internal$_length,__internal$_index,__internal$_current",
       get$current: function() {
@@ -6220,7 +6266,22 @@
       "%": "HTMLCanvasElement"
     },
     CanvasRenderingContext2D: {
-      "^": "Interceptor;fillStyle}",
+      "^": "Interceptor;fillStyle},strokeStyle}",
+      stroke$1: function(receiver, path) {
+        return receiver.stroke(path);
+      },
+      stroke$0: function($receiver) {
+        return $receiver.stroke();
+      },
+      lineTo$2: function(receiver, x, y) {
+        return receiver.lineTo(x, y);
+      },
+      fillText$4: function(receiver, text, x, y, maxWidth) {
+        receiver.fillText(text, x, y);
+      },
+      fillText$3: function($receiver, text, x, y) {
+        return this.fillText$4($receiver, text, x, y, null);
+      },
       fill$1: function(receiver, winding) {
         receiver.fill(winding);
       },
@@ -6460,8 +6521,14 @@
       hash = 536870911 & hash + ((524287 & hash) << 10);
       return hash ^ hash >>> 6;
     },
+    _JSRandom: {
+      "^": "Object;",
+      nextDouble$0: function() {
+        return Math.random();
+      }
+    },
     Point: {
-      "^": "Object;x>,y,$ti",
+      "^": "Object;x>,y>,$ti",
       toString$0: function(_) {
         return "Point(" + H.S(this.x) + ", " + H.S(this.y) + ")";
       },
@@ -6499,92 +6566,100 @@
       "%": "SVGAnimateElement|SVGAnimateMotionElement|SVGAnimateTransformElement|SVGAnimationElement|SVGSetElement"
     },
     FEBlendElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEBlendElement"
     },
     FEColorMatrixElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEColorMatrixElement"
     },
     FEComponentTransferElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEComponentTransferElement"
     },
     FECompositeElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFECompositeElement"
     },
     FEConvolveMatrixElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEConvolveMatrixElement"
     },
     FEDiffuseLightingElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEDiffuseLightingElement"
     },
     FEDisplacementMapElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEDisplacementMapElement"
     },
     FEFloodElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEFloodElement"
     },
     FEGaussianBlurElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEGaussianBlurElement"
     },
     FEImageElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEImageElement"
     },
     FEMergeElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEMergeElement"
     },
     FEMorphologyElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEMorphologyElement"
     },
     FEOffsetElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEOffsetElement"
     },
+    FEPointLightElement: {
+      "^": "SvgElement;x=,y=",
+      "%": "SVGFEPointLightElement"
+    },
     FESpecularLightingElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFESpecularLightingElement"
     },
+    FESpotLightElement: {
+      "^": "SvgElement;x=,y=",
+      "%": "SVGFESpotLightElement"
+    },
     FETileElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFETileElement"
     },
     FETurbulenceElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFETurbulenceElement"
     },
     FilterElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFilterElement"
     },
     ForeignObjectElement: {
-      "^": "GraphicsElement;height=,width=",
+      "^": "GraphicsElement;height=,width=,x=,y=",
       "%": "SVGForeignObjectElement"
     },
     GeometryElement: {
@@ -6597,7 +6672,7 @@
       "%": "SVGClipPathElement|SVGDefsElement|SVGGElement|SVGSwitchElement;SVGGraphicsElement"
     },
     ImageElement0: {
-      "^": "GraphicsElement;height=,width=",
+      "^": "GraphicsElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGImageElement"
     },
@@ -6607,17 +6682,17 @@
       "%": "SVGMarkerElement"
     },
     MaskElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGMaskElement"
     },
     PatternElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGPatternElement"
     },
     RectElement: {
-      "^": "GeometryElement;height=,width=",
+      "^": "GeometryElement;height=,width=,x=,y=",
       "%": "SVGRectElement"
     },
     ScriptElement0: {
@@ -6628,10 +6703,10 @@
     SvgElement: {
       "^": "Element;",
       $isInterceptor: 1,
-      "%": "SVGComponentTransferFunctionElement|SVGDescElement|SVGDiscardElement|SVGFEDistantLightElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGFEPointLightElement|SVGFESpotLightElement|SVGMetadataElement|SVGStopElement|SVGStyleElement|SVGTitleElement;SVGElement"
+      "%": "SVGComponentTransferFunctionElement|SVGDescElement|SVGDiscardElement|SVGFEDistantLightElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGMetadataElement|SVGStopElement|SVGStyleElement|SVGTitleElement;SVGElement"
     },
     SvgSvgElement: {
-      "^": "GraphicsElement;height=,width=",
+      "^": "GraphicsElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGSVGElement"
     },
@@ -6642,15 +6717,19 @@
     },
     TextContentElement: {
       "^": "GraphicsElement;",
-      "%": "SVGTSpanElement|SVGTextElement|SVGTextPositioningElement;SVGTextContentElement"
+      "%": ";SVGTextContentElement"
     },
     TextPathElement: {
       "^": "TextContentElement;",
       $isInterceptor: 1,
       "%": "SVGTextPathElement"
     },
+    TextPositioningElement: {
+      "^": "TextContentElement;x=,y=",
+      "%": "SVGTSpanElement|SVGTextElement|SVGTextPositioningElement"
+    },
     UseElement: {
-      "^": "GraphicsElement;height=,width=",
+      "^": "GraphicsElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGUseElement"
     },
@@ -6696,7 +6775,7 @@
       var t1 = document.querySelector("#canvas");
       $.canvas = t1;
       $.ctx = J.getContext$1$x(t1, "2d");
-      t1 = new G.Game(0, null, null, null, null, null);
+      t1 = new G.Game(0, null, null, null, null, null, null, null);
       t1.init$0();
       C.Window_methods.get$animationFrame(window).then$1(t1.get$_onFrame());
     }, "call$0", "snek__main$closure", 0, 0, 1],
@@ -6730,23 +6809,36 @@
       }
     },
     Game: {
-      "^": "Object;_lastTimeStamp,_headPosition,_headAngle,_moveSpeed,_rotateSpeed,_needsDraw",
+      "^": "Object;_lastTimeStamp,_needsDraw,_headPosition,_headAngle,_bodyPoints,_moveSpeed,_rotateSpeed,_foodPosition",
       init$0: function() {
-        var t1, t2;
+        var t1, t2, t3, i, t4, t5;
         t1 = J.get$width$x($.canvas);
         if (typeof t1 !== "number")
           return t1.$div();
         t2 = J.get$height$x($.canvas);
         if (typeof t2 !== "number")
           return t2.$div();
-        this._headPosition = new P.Point(t1 / 2, t2 / 2, [null]);
+        t3 = [null];
+        this._headPosition = new P.Point(t1 / 2, t2 / 2, t3);
         this._headAngle = 0;
         this._moveSpeed = 100;
         this._rotateSpeed = 360;
+        this._bodyPoints = [];
+        for (i = 0; i < 100; ++i)
+          this._bodyPoints.push(this._headPosition);
+        t1 = J.get$width$x($.canvas);
+        t2 = J.get$height$x($.canvas);
+        t4 = C.C__JSRandom.nextDouble$0();
+        if (typeof t1 !== "number")
+          return H.iae(t1);
+        t5 = C.C__JSRandom.nextDouble$0();
+        if (typeof t2 !== "number")
+          return H.iae(t2);
+        this._foodPosition = new P.Point(t4 * t1, t5 * t2, t3);
         this._needsDraw = true;
       },
       _onFrame$1: [function(delta) {
-        var diff, t1, t2, t3, t4;
+        var diff, t1, t2, t3;
         diff = J.$sub$n(delta, this._lastTimeStamp);
         if (J.$gt$n(diff, 10)) {
           this._lastTimeStamp = delta;
@@ -6785,28 +6877,64 @@
           if (typeof diff !== "number")
             return H.iae(diff);
           t3 = t3 * diff / 1000;
-          this._headPosition = this._headPosition.$add(0, new P.Point(t1 * t3, t2 * t3, [null]));
+          t3 = this._headPosition.$add(0, new P.Point(t1 * t3, t2 * t3, [null]));
+          this._headPosition = t3;
+          t2 = this._bodyPoints;
+          (t2 && C.JSArray_methods).checkGrowable$1(t2, "insert");
+          t2.splice(0, 0, t3);
+          t1 = this._bodyPoints;
+          if (0 >= t1.length)
+            return H.ioore(t1, -1);
+          t1.pop();
           this._needsDraw = true;
         }
         if (this._needsDraw === true) {
-          t1 = $.ctx;
-          J.set$fillStyle$x(t1, "white");
-          t1.fillRect(0, 0, J.get$width$x($.canvas), J.get$height$x($.canvas));
-          t1 = $.ctx;
-          J.getInterceptor$x(t1).set$fillStyle(t1, "green");
-          t1.beginPath();
-          t2 = this._headPosition;
-          t3 = t2.x;
-          t2 = t2.y;
-          t4 = this._headAngle;
-          if (typeof t4 !== "number")
-            return t4.$mul();
-          t1.ellipse(t3, t2, 10, 5, t4 * 3.141592653589793 / 180, 0, 6.283185307179586, true);
-          C.CanvasRenderingContext2D_methods.fill$0(t1);
+          this._draw$0();
           this._needsDraw = false;
         }
         C.Window_methods.get$animationFrame(window).then$1(this.get$_onFrame());
-      }, "call$1", "get$_onFrame", 2, 0, 13]
+      }, "call$1", "get$_onFrame", 2, 0, 13],
+      _draw$0: function() {
+        var t1, t2, pt, t3, t4;
+        t1 = $.ctx;
+        J.set$fillStyle$x(t1, "white");
+        t1.fillRect(0, 0, J.get$width$x($.canvas), J.get$height$x($.canvas));
+        t1 = $.ctx;
+        J.getInterceptor$x(t1).set$fillStyle(t1, "black");
+        t1.font = "16px sans-serif";
+        t1.textAlign = "center";
+        t1.textBaseline = "middle";
+        t2 = this._foodPosition;
+        C.CanvasRenderingContext2D_methods.fillText$3(t1, "\ud83d\udc01", t2.x, t2.y);
+        t2 = $.ctx;
+        J.set$strokeStyle$x(t2, "green");
+        t2.lineWidth = 5;
+        t2.lineCap = "round";
+        t2.lineJoin = "round";
+        t2.beginPath();
+        t1 = this._bodyPoints;
+        if (0 >= t1.length)
+          return H.ioore(t1, 0);
+        t1 = t1[0];
+        t2.moveTo(t1.x, t1.y);
+        for (t1 = this._bodyPoints, t1.toString, t1 = H.SubListIterable$(t1, 1, null, H.getTypeArgumentByIndex(t1, 0)), t1 = new H.ListIterator(t1, t1.get$length(t1), 0, null); t1.moveNext$0();) {
+          pt = t1.__internal$_current;
+          t2 = J.getInterceptor$x(pt);
+          J.lineTo$2$x($.ctx, t2.get$x(pt), t2.get$y(pt));
+        }
+        J.stroke$0$x($.ctx);
+        t1 = $.ctx;
+        J.getInterceptor$x(t1).set$fillStyle(t1, "green");
+        t1.beginPath();
+        t2 = this._headPosition;
+        t3 = t2.x;
+        t2 = t2.y;
+        t4 = this._headAngle;
+        if (typeof t4 !== "number")
+          return t4.$mul();
+        t1.ellipse(t3, t2, 10, 5, t4 * 3.141592653589793 / 180, 0, 6.283185307179586, true);
+        C.CanvasRenderingContext2D_methods.fill$0(t1);
+      }
     }
   }, 1]];
   setupProgram(dart, 0);
@@ -6899,6 +7027,9 @@
   J.set$fillStyle$x = function(receiver, value) {
     return J.getInterceptor$x(receiver).set$fillStyle(receiver, value);
   };
+  J.set$strokeStyle$x = function(receiver, value) {
+    return J.getInterceptor$x(receiver).set$strokeStyle(receiver, value);
+  };
   J.get$error$x = function(receiver) {
     return J.getInterceptor$x(receiver).get$error(receiver);
   };
@@ -6959,8 +7090,14 @@
   J.getContext$1$x = function(receiver, a0) {
     return J.getInterceptor$x(receiver).getContext$1(receiver, a0);
   };
+  J.lineTo$2$x = function(receiver, a0, a1) {
+    return J.getInterceptor$x(receiver).lineTo$2(receiver, a0, a1);
+  };
   J.map$1$ax = function(receiver, a0) {
     return J.getInterceptor$ax(receiver).map$1(receiver, a0);
+  };
+  J.stroke$0$x = function(receiver) {
+    return J.getInterceptor$x(receiver).stroke$0(receiver);
   };
   J.get$hashCode$ = function(receiver) {
     return J.getInterceptor(receiver).get$hashCode(receiver);
@@ -6988,6 +7125,7 @@
   C.UnknownJavaScriptObject_methods = J.UnknownJavaScriptObject.prototype;
   C.Window_methods = W.Window.prototype;
   C.C__DelayedDone = new P._DelayedDone();
+  C.C__JSRandom = new P._JSRandom();
   C.C__RootZone = new P._RootZone();
   C.Duration_0 = new P.Duration(0);
   C.JS_CONST_4IJ = function() {  var toStringFunction = Object.prototype.toString;  function getTag(o) {    var s = toStringFunction.call(o);    return s.substring(8, s.length - 1);  }  function getUnknownTag(object, tag) {    if (/^HTML[A-Z].*Element$/.test(tag)) {      var name = toStringFunction.call(object);      if (name == "[object Object]") return null;      return "HTMLElement";    }  }  function getUnknownTagGenericBrowser(object, tag) {    if (self.HTMLElement && object instanceof HTMLElement) return "HTMLElement";    return getUnknownTag(object, tag);  }  function prototypeForTag(tag) {    if (typeof window == "undefined") return null;    if (typeof window[tag] == "undefined") return null;    var constructor = window[tag];    if (typeof constructor != "function") return null;    return constructor.prototype;  }  function discriminator(tag) { return null; }  var isBrowser = typeof navigator == "object";  return {    getTag: getTag,    getUnknownTag: isBrowser ? getUnknownTagGenericBrowser : getUnknownTag,    prototypeForTag: prototypeForTag,    discriminator: discriminator };};

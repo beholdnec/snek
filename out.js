@@ -646,20 +646,6 @@
         if (!!receiver.fixed$length)
           throw H.wrapException(new P.UnsupportedError(reason));
       },
-      insert$2: function(receiver, index, value) {
-        var t1;
-        this.checkGrowable$1(receiver, "insert");
-        t1 = receiver.length;
-        if (index > t1)
-          throw H.wrapException(P.RangeError$value(index, null, null));
-        receiver.splice(index, 0, value);
-      },
-      removeLast$0: function(receiver) {
-        this.checkGrowable$1(receiver, "removeLast");
-        if (receiver.length === 0)
-          throw H.wrapException(H.diagnoseIndexError(receiver, -1));
-        return receiver.pop();
-      },
       map$1: function(receiver, f) {
         return new H.MappedListIterable(receiver, f, [H.getTypeArgumentByIndex(receiver, 0), null]);
       },
@@ -918,52 +904,6 @@
       },
       toList$0: function($receiver) {
         return this.toList$1$growable($receiver, true);
-      }
-    },
-    SubListIterable: {
-      "^": "ListIterable;_iterable,_start,_endOrLength,$ti",
-      get$_endIndex: function() {
-        var $length = J.get$length$asx(this._iterable);
-        return $length;
-      },
-      get$_startIndex: function() {
-        var $length, t1;
-        $length = J.get$length$asx(this._iterable);
-        t1 = this._start;
-        if (t1 > $length)
-          return $length;
-        return t1;
-      },
-      get$length: function(_) {
-        var $length, t1;
-        $length = J.get$length$asx(this._iterable);
-        t1 = this._start;
-        if (t1 >= $length)
-          return 0;
-        return $length - t1;
-      },
-      elementAt$1: function(_, index) {
-        var realIndex, t1;
-        realIndex = this.get$_startIndex() + index;
-        if (index >= 0) {
-          t1 = this.get$_endIndex();
-          if (typeof t1 !== "number")
-            return H.iae(t1);
-          t1 = realIndex >= t1;
-        } else
-          t1 = true;
-        if (t1)
-          throw H.wrapException(P.IndexError$(index, this, "index", null, null));
-        return J.elementAt$1$ax(this._iterable, realIndex);
-      },
-      SubListIterable$3: function(_iterable, _start, _endOrLength, $E) {
-      },
-      static: {
-        SubListIterable$: function(_iterable, _start, _endOrLength, $E) {
-          var t1 = new H.SubListIterable(_iterable, _start, _endOrLength, [$E]);
-          t1.SubListIterable$3(_iterable, _start, _endOrLength, $E);
-          return t1;
-        }
       }
     },
     ListIterator: {
@@ -5863,18 +5803,6 @@
         list.push(t1.get$current());
       return list;
     },
-    List_List$generate: function($length, generator, growable, $E) {
-      var result, i, t1;
-      result = H.setRuntimeTypeInfo([], [$E]);
-      C.JSArray_methods.set$length(result, $length);
-      for (i = 0; i < $length; ++i) {
-        t1 = generator.call$1(i);
-        if (i >= result.length)
-          return H.ioore(result, i);
-        result[i] = t1;
-      }
-      return result;
-    },
     print: function(object) {
       H.printString(H.S(object));
     },
@@ -6017,9 +5945,6 @@
         return explanation;
       },
       static: {
-        RangeError$: function(message) {
-          return new P.RangeError(null, null, false, null, null, message);
-        },
         RangeError$value: function(value, $name, message) {
           return new P.RangeError(null, null, true, value, $name, "Value not in range");
         },
@@ -6296,8 +6221,11 @@
     },
     CanvasRenderingContext2D: {
       "^": "Interceptor;fillStyle}",
-      fillRect$4: function(receiver, x, y, width, height) {
-        return receiver.fillRect(x, y, width, height);
+      fill$1: function(receiver, winding) {
+        receiver.fill(winding);
+      },
+      fill$0: function($receiver) {
+        return this.fill$1($receiver, "nonzero");
       },
       "%": "CanvasRenderingContext2D"
     },
@@ -6532,18 +6460,10 @@
       hash = 536870911 & hash + ((524287 & hash) << 10);
       return hash ^ hash >>> 6;
     },
-    _JSRandom: {
-      "^": "Object;",
-      nextInt$1: function(max) {
-        if (max <= 0 || max > 4294967296)
-          throw H.wrapException(P.RangeError$("max must be in range 0 < max \u2264 2^32, was " + max));
-        return Math.random() * max >>> 0;
-      }
-    },
     Point: {
-      "^": "Object;x>,y>,$ti",
+      "^": "Object;x>,y,$ti",
       toString$0: function(_) {
-        return "Point(" + this.x + ", " + this.y + ")";
+        return "Point(" + H.S(this.x) + ", " + H.S(this.y) + ")";
       },
       $eq: function(_, other) {
         if (other == null)
@@ -6579,100 +6499,92 @@
       "%": "SVGAnimateElement|SVGAnimateMotionElement|SVGAnimateTransformElement|SVGAnimationElement|SVGSetElement"
     },
     FEBlendElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEBlendElement"
     },
     FEColorMatrixElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEColorMatrixElement"
     },
     FEComponentTransferElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEComponentTransferElement"
     },
     FECompositeElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFECompositeElement"
     },
     FEConvolveMatrixElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEConvolveMatrixElement"
     },
     FEDiffuseLightingElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEDiffuseLightingElement"
     },
     FEDisplacementMapElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEDisplacementMapElement"
     },
     FEFloodElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEFloodElement"
     },
     FEGaussianBlurElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEGaussianBlurElement"
     },
     FEImageElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEImageElement"
     },
     FEMergeElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEMergeElement"
     },
     FEMorphologyElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEMorphologyElement"
     },
     FEOffsetElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEOffsetElement"
     },
-    FEPointLightElement: {
-      "^": "SvgElement;x=,y=",
-      "%": "SVGFEPointLightElement"
-    },
     FESpecularLightingElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFESpecularLightingElement"
     },
-    FESpotLightElement: {
-      "^": "SvgElement;x=,y=",
-      "%": "SVGFESpotLightElement"
-    },
     FETileElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFETileElement"
     },
     FETurbulenceElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFETurbulenceElement"
     },
     FilterElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFilterElement"
     },
     ForeignObjectElement: {
-      "^": "GraphicsElement;height=,width=,x=,y=",
+      "^": "GraphicsElement;height=,width=",
       "%": "SVGForeignObjectElement"
     },
     GeometryElement: {
@@ -6685,7 +6597,7 @@
       "%": "SVGClipPathElement|SVGDefsElement|SVGGElement|SVGSwitchElement;SVGGraphicsElement"
     },
     ImageElement0: {
-      "^": "GraphicsElement;height=,width=,x=,y=",
+      "^": "GraphicsElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGImageElement"
     },
@@ -6695,17 +6607,17 @@
       "%": "SVGMarkerElement"
     },
     MaskElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGMaskElement"
     },
     PatternElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGPatternElement"
     },
     RectElement: {
-      "^": "GeometryElement;height=,width=,x=,y=",
+      "^": "GeometryElement;height=,width=",
       "%": "SVGRectElement"
     },
     ScriptElement0: {
@@ -6716,10 +6628,10 @@
     SvgElement: {
       "^": "Element;",
       $isInterceptor: 1,
-      "%": "SVGComponentTransferFunctionElement|SVGDescElement|SVGDiscardElement|SVGFEDistantLightElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGMetadataElement|SVGStopElement|SVGStyleElement|SVGTitleElement;SVGElement"
+      "%": "SVGComponentTransferFunctionElement|SVGDescElement|SVGDiscardElement|SVGFEDistantLightElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGFEPointLightElement|SVGFESpotLightElement|SVGMetadataElement|SVGStopElement|SVGStyleElement|SVGTitleElement;SVGElement"
     },
     SvgSvgElement: {
-      "^": "GraphicsElement;height=,width=,x=,y=",
+      "^": "GraphicsElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGSVGElement"
     },
@@ -6730,19 +6642,15 @@
     },
     TextContentElement: {
       "^": "GraphicsElement;",
-      "%": ";SVGTextContentElement"
+      "%": "SVGTSpanElement|SVGTextElement|SVGTextPositioningElement;SVGTextContentElement"
     },
     TextPathElement: {
       "^": "TextContentElement;",
       $isInterceptor: 1,
       "%": "SVGTextPathElement"
     },
-    TextPositioningElement: {
-      "^": "TextContentElement;x=,y=",
-      "%": "SVGTSpanElement|SVGTextElement|SVGTextPositioningElement"
-    },
     UseElement: {
-      "^": "GraphicsElement;height=,width=,x=,y=",
+      "^": "GraphicsElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGUseElement"
     },
@@ -6785,41 +6693,13 @@
   }], ["", "snek.dart",, G, {
     "^": "",
     main: [function() {
-      var t1, t2;
-      t1 = document.querySelector("#canvas");
+      var t1 = document.querySelector("#canvas");
       $.canvas = t1;
       $.ctx = J.getContext$1$x(t1, "2d");
-      t1 = new G.Game(0, null, null, null, null);
-      t2 = J.get$width$x($.canvas);
-      if (typeof t2 !== "number")
-        return t2.$tdiv();
-      t1._rightEdgeX = C.JSInt_methods._tdivFast$1(t2, 10);
-      t2 = J.get$height$x($.canvas);
-      if (typeof t2 !== "number")
-        return t2.$tdiv();
-      t1._bottomEdgeY = C.JSInt_methods._tdivFast$1(t2, 10);
-      t1._snake = G.Snake$();
-      t1._food = t1._randomPoint$0();
-      C.Window_methods.get$animationFrame(window).then$1(t1.get$update());
+      t1 = new G.Game(0, null, null, null, null, null);
+      t1.init$0();
+      C.Window_methods.get$animationFrame(window).then$1(t1.get$_onFrame());
     }, "call$0", "snek__main$closure", 0, 0, 1],
-    drawCell: function(coords, color) {
-      var t1, t2, x, y;
-      t1 = $.ctx;
-      J.set$fillStyle$x(t1, color);
-      t1.strokeStyle = "white";
-      t1 = J.getInterceptor$x(coords);
-      t2 = t1.get$x(coords);
-      if (typeof t2 !== "number")
-        return t2.$mul();
-      x = t2 * 10;
-      t1 = t1.get$y(coords);
-      if (typeof t1 !== "number")
-        return t1.$mul();
-      y = t1 * 10;
-      t1 = $.ctx;
-      J.fillRect$4$x(t1, x, y, 10, 10);
-      t1.strokeRect(x, y, 10, 10);
-    },
     Keyboard: {
       "^": "Object;_keys",
       Keyboard$0: function() {
@@ -6829,8 +6709,7 @@
       },
       static: {
         Keyboard$: function() {
-          var t1 = P.int;
-          t1 = new G.Keyboard(P.HashMap_HashMap(null, null, null, t1, t1));
+          var t1 = new G.Keyboard(P.HashMap_HashMap(null, null, null, P.int, P.double));
           t1.Keyboard$0();
           return t1;
         }
@@ -6850,111 +6729,84 @@
         this.$this._keys.remove$1(0, J.get$keyCode$x($event));
       }
     },
-    Snake: {
-      "^": "Object;_body,_dir",
-      _draw$0: function() {
-        var t1, t2, _i;
-        for (t1 = this._body, t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i)
-          G.drawCell(t1[_i], "green");
-      },
-      checkForBodyCollision$0: function() {
-        var t1, p, t2;
-        for (t1 = this._body, t1.toString, t1 = H.SubListIterable$(t1, 1, null, H.getTypeArgumentByIndex(t1, 0)), t1 = new H.ListIterator(t1, t1.get$length(t1), 0, null); t1.moveNext$0();) {
-          p = t1.__internal$_current;
-          t2 = this._body;
-          if (J.$eq$(p, (t2 && C.JSArray_methods).get$first(t2)))
-            return true;
-        }
-        return false;
-      },
-      Snake$0: function(_box_0) {
-        _box_0.i = 5;
-        this._body = P.List_List$generate(6, new G.Snake_closure(_box_0), true, P.Point);
-      },
-      static: {
-        Snake$: function() {
-          var t1 = new G.Snake(null, C.Point_1_0);
-          t1.Snake$0({});
-          return t1;
-        }
-      }
-    },
-    Snake_closure: {
-      "^": "Closure:13;_box_0",
-      call$1: function(index) {
-        return new P.Point(this._box_0.i--, 0, [null]);
-      }
-    },
     Game: {
-      "^": "Object;_lastTimeStamp,_rightEdgeX,_bottomEdgeY,_snake,_food",
-      _randomPoint$0: function() {
-        return new P.Point(C.C__JSRandom.nextInt$1(this._rightEdgeX), C.C__JSRandom.nextInt$1(this._bottomEdgeY), [null]);
-      },
-      update$1: [function(delta) {
+      "^": "Object;_lastTimeStamp,_headPosition,_headAngle,_moveSpeed,_rotateSpeed,_needsDraw",
+      init$0: function() {
         var t1, t2;
-        if (J.$gt$n(J.$sub$n(delta, this._lastTimeStamp), 50)) {
+        t1 = J.get$width$x($.canvas);
+        if (typeof t1 !== "number")
+          return t1.$div();
+        t2 = J.get$height$x($.canvas);
+        if (typeof t2 !== "number")
+          return t2.$div();
+        this._headPosition = new P.Point(t1 / 2, t2 / 2, [null]);
+        this._headAngle = 0;
+        this._moveSpeed = 100;
+        this._rotateSpeed = 360;
+        this._needsDraw = true;
+      },
+      _onFrame$1: [function(delta) {
+        var diff, t1, t2, t3, t4;
+        diff = J.$sub$n(delta, this._lastTimeStamp);
+        if (J.$gt$n(diff, 10)) {
           this._lastTimeStamp = delta;
+          if ($.$get$keyboard()._keys.containsKey$1(37)) {
+            t1 = this._headAngle;
+            t2 = this._rotateSpeed;
+            if (typeof t2 !== "number")
+              return t2.$mul();
+            if (typeof diff !== "number")
+              return H.iae(diff);
+            if (typeof t1 !== "number")
+              return t1.$sub();
+            this._headAngle = t1 - t2 * diff / 1000;
+          } else if ($.$get$keyboard()._keys.containsKey$1(39)) {
+            t1 = this._headAngle;
+            t2 = this._rotateSpeed;
+            if (typeof t2 !== "number")
+              return t2.$mul();
+            if (typeof diff !== "number")
+              return H.iae(diff);
+            if (typeof t1 !== "number")
+              return t1.$add();
+            this._headAngle = t1 + t2 * diff / 1000;
+          }
+          t1 = this._headAngle;
+          if (typeof t1 !== "number")
+            return t1.$mul();
+          t1 = Math.cos(t1 * 3.141592653589793 / 180);
+          t2 = this._headAngle;
+          if (typeof t2 !== "number")
+            return t2.$mul();
+          t2 = Math.sin(t2 * 3.141592653589793 / 180);
+          t3 = this._moveSpeed;
+          if (typeof t3 !== "number")
+            return t3.$mul();
+          if (typeof diff !== "number")
+            return H.iae(diff);
+          t3 = t3 * diff / 1000;
+          this._headPosition = this._headPosition.$add(0, new P.Point(t1 * t3, t2 * t3, [null]));
+          this._needsDraw = true;
+        }
+        if (this._needsDraw === true) {
           t1 = $.ctx;
           J.set$fillStyle$x(t1, "white");
           t1.fillRect(0, 0, J.get$width$x($.canvas), J.get$height$x($.canvas));
-          G.drawCell(this._food, "blue");
-          t1 = this._snake;
-          t1.toString;
-          if ($.$get$keyboard()._keys.containsKey$1(37) && !t1._dir.$eq(0, C.Point_1_0))
-            t1._dir = C.Point_m1_0;
-          else if ($.$get$keyboard()._keys.containsKey$1(39) && !t1._dir.$eq(0, C.Point_m1_0))
-            t1._dir = C.Point_1_0;
-          else if ($.$get$keyboard()._keys.containsKey$1(38) && !t1._dir.$eq(0, C.Point_0_1))
-            t1._dir = C.Point_0_m1;
-          else if ($.$get$keyboard()._keys.containsKey$1(40) && !t1._dir.$eq(0, C.Point_0_m1))
-            t1._dir = C.Point_0_1;
-          t2 = t1._body;
-          C.JSArray_methods.insert$2(t2, 0, J.$add$ns((t2 && C.JSArray_methods).get$first(t2), t1._dir));
-          t2 = t1._body;
-          (t2 && C.JSArray_methods).removeLast$0(t2);
-          t1._draw$0();
-          t1 = this._snake._body;
-          if (J.$eq$((t1 && C.JSArray_methods).get$first(t1), this._food)) {
-            t1 = this._snake;
-            t2 = t1._body;
-            C.JSArray_methods.insert$2(t2, 0, J.$add$ns((t2 && C.JSArray_methods).get$first(t2), t1._dir));
-            this._food = this._randomPoint$0();
-          }
-          t1 = this._snake._body;
-          t1 = J.get$x$x((t1 && C.JSArray_methods).get$first(t1));
-          if (typeof t1 !== "number")
-            return t1.$le();
-          if (t1 > -1) {
-            t1 = this._snake._body;
-            t1 = J.get$x$x((t1 && C.JSArray_methods).get$first(t1));
-            t2 = this._rightEdgeX;
-            if (typeof t1 !== "number")
-              return t1.$ge();
-            if (t1 < t2) {
-              t1 = this._snake._body;
-              t1 = J.get$y$x((t1 && C.JSArray_methods).get$first(t1));
-              if (typeof t1 !== "number")
-                return t1.$le();
-              if (t1 > -1) {
-                t1 = this._snake._body;
-                t1 = J.get$y$x((t1 && C.JSArray_methods).get$first(t1));
-                t2 = this._bottomEdgeY;
-                if (typeof t1 !== "number")
-                  return t1.$ge();
-                t1 = t1 >= t2 || this._snake.checkForBodyCollision$0();
-              } else
-                t1 = true;
-            } else
-              t1 = true;
-          } else
-            t1 = true;
-          if (t1) {
-            this._snake = G.Snake$();
-            this._food = this._randomPoint$0();
-          }
+          t1 = $.ctx;
+          J.getInterceptor$x(t1).set$fillStyle(t1, "green");
+          t1.beginPath();
+          t2 = this._headPosition;
+          t3 = t2.x;
+          t2 = t2.y;
+          t4 = this._headAngle;
+          if (typeof t4 !== "number")
+            return t4.$mul();
+          t1.ellipse(t3, t2, 10, 5, t4 * 3.141592653589793 / 180, 0, 6.283185307179586, true);
+          C.CanvasRenderingContext2D_methods.fill$0(t1);
+          this._needsDraw = false;
         }
-        C.Window_methods.get$animationFrame(window).then$1(this.get$update());
-      }, "call$1", "get$update", 2, 0, 14]
+        C.Window_methods.get$animationFrame(window).then$1(this.get$_onFrame());
+      }, "call$1", "get$_onFrame", 2, 0, 13]
     }
   }, 1]];
   setupProgram(dart, 0);
@@ -7068,9 +6920,6 @@
   J.get$x$x = function(receiver) {
     return J.getInterceptor$x(receiver).get$x(receiver);
   };
-  J.get$y$x = function(receiver) {
-    return J.getInterceptor$x(receiver).get$y(receiver);
-  };
   J.$add$ns = function(receiver, a0) {
     if (typeof receiver == "number" && typeof a0 == "number")
       return receiver + a0;
@@ -7107,9 +6956,6 @@
   J.elementAt$1$ax = function(receiver, a0) {
     return J.getInterceptor$ax(receiver).elementAt$1(receiver, a0);
   };
-  J.fillRect$4$x = function(receiver, a0, a1, a2, a3) {
-    return J.getInterceptor$x(receiver).fillRect$4(receiver, a0, a1, a2, a3);
-  };
   J.getContext$1$x = function(receiver, a0) {
     return J.getInterceptor$x(receiver).getContext$1(receiver, a0);
   };
@@ -7131,6 +6977,7 @@
   };
   // Output contains no constant list.
   var $ = Isolate.$isolateProperties;
+  C.CanvasRenderingContext2D_methods = W.CanvasRenderingContext2D.prototype;
   C.Interceptor_methods = J.Interceptor.prototype;
   C.JSArray_methods = J.JSArray.prototype;
   C.JSInt_methods = J.JSInt.prototype;
@@ -7141,7 +6988,6 @@
   C.UnknownJavaScriptObject_methods = J.UnknownJavaScriptObject.prototype;
   C.Window_methods = W.Window.prototype;
   C.C__DelayedDone = new P._DelayedDone();
-  C.C__JSRandom = new P._JSRandom();
   C.C__RootZone = new P._RootZone();
   C.Duration_0 = new P.Duration(0);
   C.JS_CONST_4IJ = function() {  var toStringFunction = Object.prototype.toString;  function getTag(o) {    var s = toStringFunction.call(o);    return s.substring(8, s.length - 1);  }  function getUnknownTag(object, tag) {    if (/^HTML[A-Z].*Element$/.test(tag)) {      var name = toStringFunction.call(object);      if (name == "[object Object]") return null;      return "HTMLElement";    }  }  function getUnknownTagGenericBrowser(object, tag) {    if (self.HTMLElement && object instanceof HTMLElement) return "HTMLElement";    return getUnknownTag(object, tag);  }  function prototypeForTag(tag) {    if (typeof window == "undefined") return null;    if (typeof window[tag] == "undefined") return null;    var constructor = window[tag];    if (typeof constructor != "function") return null;    return constructor.prototype;  }  function discriminator(tag) { return null; }  var isBrowser = typeof navigator == "object";  return {    getTag: getTag,    getUnknownTag: isBrowser ? getUnknownTagGenericBrowser : getUnknownTag,    prototypeForTag: prototypeForTag,    discriminator: discriminator };};
@@ -7152,10 +6998,6 @@
   C.JS_CONST_TSE = function getTagFallback(o) {  var s = Object.prototype.toString.call(o);  return s.substring(8, s.length - 1);};
   C.JS_CONST_c0o = function(hooks) {  var userAgent = typeof navigator == "object" ? navigator.userAgent : "";  if (userAgent.indexOf("Trident/") == -1) return hooks;  var getTag = hooks.getTag;  var quickMap = {    "BeforeUnloadEvent": "Event",    "DataTransfer": "Clipboard",    "HTMLDDElement": "HTMLElement",    "HTMLDTElement": "HTMLElement",    "HTMLPhraseElement": "HTMLElement",    "Position": "Geoposition"  };  function getTagIE(o) {    var tag = getTag(o);    var newTag = quickMap[tag];    if (newTag) return newTag;    if (tag == "Object") {      if (window.DataView && (o instanceof window.DataView)) return "DataView";    }    return tag;  }  function prototypeForTagIE(tag) {    var constructor = window[tag];    if (constructor == null) return null;    return constructor.prototype;  }  hooks.getTag = getTagIE;  hooks.prototypeForTag = prototypeForTagIE;};
   C.JS_CONST_nuk = function(getTagFallback) {  return function(hooks) {    if (typeof navigator != "object") return hooks;    var ua = navigator.userAgent;    if (ua.indexOf("DumpRenderTree") >= 0) return hooks;    if (ua.indexOf("Chrome") >= 0) {      function confirm(p) {        return typeof window == "object" && window[p] && window[p].name == p;      }      if (confirm("Window") && confirm("HTMLElement")) return hooks;    }    hooks.getTag = getTagFallback;  };};
-  C.Point_0_1 = new P.Point(0, 1, [null]);
-  C.Point_0_m1 = new P.Point(0, -1, [null]);
-  C.Point_1_0 = new P.Point(1, 0, [null]);
-  C.Point_m1_0 = new P.Point(-1, 0, [null]);
   $.Primitives_mirrorFunctionCacheName = "$cachedFunction";
   $.Primitives_mirrorInvokeCacheName = "$cachedInvocation";
   $.Closure_functionCounter = 0;
@@ -7283,7 +7125,7 @@
   Isolate = Isolate.$finishIsolateConstructor(Isolate);
   $ = new Isolate();
   init.metadata = [null];
-  init.types = [{func: 1}, {func: 1, v: true}, {func: 1, args: [,]}, {func: 1, v: true, args: [{func: 1, v: true}]}, {func: 1, ret: P.String, args: [P.int]}, {func: 1, args: [W.KeyboardEvent]}, {func: 1, args: [, P.String]}, {func: 1, args: [P.String]}, {func: 1, args: [{func: 1, v: true}]}, {func: 1, v: true, args: [P.Object], opt: [P.StackTrace]}, {func: 1, args: [,], opt: [,]}, {func: 1, v: true, args: [, P.StackTrace]}, {func: 1, args: [,,]}, {func: 1, args: [P.int]}, {func: 1, v: true, args: [P.num]}];
+  init.types = [{func: 1}, {func: 1, v: true}, {func: 1, args: [,]}, {func: 1, v: true, args: [{func: 1, v: true}]}, {func: 1, ret: P.String, args: [P.int]}, {func: 1, args: [W.KeyboardEvent]}, {func: 1, args: [, P.String]}, {func: 1, args: [P.String]}, {func: 1, args: [{func: 1, v: true}]}, {func: 1, v: true, args: [P.Object], opt: [P.StackTrace]}, {func: 1, args: [,], opt: [,]}, {func: 1, v: true, args: [, P.StackTrace]}, {func: 1, args: [,,]}, {func: 1, v: true, args: [P.num]}];
   function convertToFastObject(properties) {
     function MyClass() {
     }

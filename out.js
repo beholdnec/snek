@@ -6570,6 +6570,9 @@
       },
       $sub: function(_, other) {
         return new P.Point(this.x - J.get$x$x(other), this.y - other.y, this.$ti);
+      },
+      $mul: function(_, factor) {
+        return new P.Point(this.x * factor, this.y * factor, this.$ti);
       }
     }
   }], ["dart.dom.svg", "dart:svg",, P, {
@@ -6860,7 +6863,7 @@
         this._needsDraw = true;
       },
       _onFrame$1: [function(delta) {
-        var diff, t1, t2, t3, dx, dy;
+        var diff, t1, t2, t3, offset, dx, dy;
         diff = J.$sub$n(delta, this._lastTimeStamp);
         if (J.$gt$n(diff, 10)) {
           this._lastTimeStamp = delta;
@@ -6902,8 +6905,8 @@
             return t3.$mul();
           if (typeof diff !== "number")
             return H.iae(diff);
-          t3 = t3 * diff / 1000;
-          t3 = this._headPosition.$add(0, new P.Point(t1 * t3, t2 * t3, [null]));
+          offset = new P.Point(t1, t2, [null]).$mul(0, t3 * diff / 1000);
+          t3 = this._headPosition.$add(0, offset);
           this._headPosition = t3;
           t2 = this._bodyPoints;
           (t2 && C.JSArray_methods).insert$2(t2, 0, t3);
@@ -6958,7 +6961,7 @@
         C.Window_methods.get$animationFrame(window).then$1(this.get$_onFrame());
       }, "call$1", "get$_onFrame", 2, 0, 13],
       _draw$0: function() {
-        var t1, t2, pt, t3, t4;
+        var t1, t2, pt, headAngleRads, angleVectorNormal, leftEyePosition, rightEyePosition;
         t1 = $.ctx;
         J.set$fillStyle$x(t1, "white");
         t1.fillRect(0, 0, J.get$width$x($.canvas), J.get$height$x($.canvas));
@@ -6970,7 +6973,7 @@
         t2 = this._foodPosition;
         C.CanvasRenderingContext2D_methods.fillText$3(t1, "\ud83d\udc01", t2.x, t2.y);
         t2 = $.ctx;
-        J.set$strokeStyle$x(t2, "green");
+        J.set$strokeStyle$x(t2, "LawnGreen");
         t2.lineWidth = 8;
         t2.lineCap = "round";
         t2.lineJoin = "round";
@@ -6986,16 +6989,27 @@
           J.lineTo$2$x($.ctx, t2.get$x(pt), t2.get$y(pt));
         }
         J.stroke$0$x($.ctx);
+        t1 = this._headAngle;
+        if (typeof t1 !== "number")
+          return t1.$mul();
+        headAngleRads = t1 * 3.141592653589793 / 180;
+        t1 = Math.cos(headAngleRads);
+        angleVectorNormal = new P.Point(-Math.sin(headAngleRads), t1, [null]);
         t1 = $.ctx;
-        J.getInterceptor$x(t1).set$fillStyle(t1, "green");
+        J.getInterceptor$x(t1).set$fillStyle(t1, "LawnGreen");
         t1.beginPath();
         t2 = this._headPosition;
-        t3 = t2.x;
-        t2 = t2.y;
-        t4 = this._headAngle;
-        if (typeof t4 !== "number")
-          return t4.$mul();
-        t1.ellipse(t3, t2, 10, 7, t4 * 3.141592653589793 / 180, 0, 6.283185307179586, true);
+        t1.ellipse(t2.x, t2.y, 10, 7, headAngleRads, 0, 6.283185307179586, true);
+        C.CanvasRenderingContext2D_methods.fill$0(t1);
+        leftEyePosition = this._headPosition.$add(0, angleVectorNormal.$mul(0, 7));
+        rightEyePosition = this._headPosition.$sub(0, angleVectorNormal.$mul(0, 7));
+        t1 = $.ctx;
+        J.getInterceptor$x(t1).set$fillStyle(t1, "Teal");
+        t1.beginPath();
+        t1.ellipse(leftEyePosition.x, leftEyePosition.y, 3, 1.5, headAngleRads, 0, 6.283185307179586, true);
+        C.CanvasRenderingContext2D_methods.fill$0(t1);
+        t1.beginPath();
+        t1.ellipse(rightEyePosition.x, rightEyePosition.y, 3, 1.5, headAngleRads, 0, 6.283185307179586, true);
         C.CanvasRenderingContext2D_methods.fill$0(t1);
       }
     }

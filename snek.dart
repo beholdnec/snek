@@ -54,8 +54,13 @@ class Game {
   static const num FOOD_DIAMETER = 20;
 
   // constants for drawing
+  static const String HEAD_FILL_STYLE = 'LawnGreen';
   static const num HEAD_LENGTH = 20;
   static const num HEAD_WIDTH = 14;
+  static const String EYE_FILL_STYLE = 'Teal';
+  static const num EYE_LENGTH = 6;
+  static const num EYE_WIDTH = 3;
+  static const String BODY_STROKE_STYLE = 'LawnGreen';
   static const num BODY_WIDTH = 8;
 
   num _lastTimeStamp = 0;
@@ -172,7 +177,7 @@ class Game {
 
     // draw snake body
     // body is drawn before head so head appears above body
-    ctx..strokeStyle = 'green'
+    ctx..strokeStyle = BODY_STROKE_STYLE
       ..lineWidth = BODY_WIDTH
       ..lineCap = 'round'
       ..lineJoin = 'round'
@@ -183,11 +188,28 @@ class Game {
     }
     ctx..stroke();
 
+    double headAngleRads = _headAngle * PI / 180;
+    Point angleVector = new Point(cos(headAngleRads), sin(headAngleRads));
+    Point angleVectorNormal = new Point(-angleVector.y, angleVector.x);
+
     // draw snake head
-    ctx..fillStyle = 'green'
+    ctx..fillStyle = HEAD_FILL_STYLE
       ..beginPath()
       ..ellipse(_headPosition.x, _headPosition.y, HEAD_LENGTH/2, HEAD_WIDTH/2,
-        _headAngle * PI / 180, 0, 2 * PI, true)
+        headAngleRads, 0, 2 * PI, true)
+      ..fill();
+
+    // draw snake eyes
+    Point leftEyePosition = _headPosition + angleVectorNormal * (HEAD_WIDTH/2);
+    Point rightEyePosition = _headPosition - angleVectorNormal * (HEAD_WIDTH/2);
+    ctx..fillStyle = EYE_FILL_STYLE
+      ..beginPath()
+      ..ellipse(leftEyePosition.x, leftEyePosition.y, EYE_LENGTH/2, EYE_WIDTH/2,
+        headAngleRads, 0, 2 * PI, true)
+      ..fill()
+      ..beginPath()
+      ..ellipse(rightEyePosition.x, rightEyePosition.y, EYE_LENGTH/2, EYE_WIDTH/2,
+        headAngleRads, 0, 2 * PI, true)
       ..fill();
   }
 }

@@ -646,6 +646,14 @@
         if (!!receiver.fixed$length)
           throw H.wrapException(new P.UnsupportedError(reason));
       },
+      insert$2: function(receiver, index, value) {
+        var t1;
+        this.checkGrowable$1(receiver, "insert");
+        t1 = receiver.length;
+        if (index > t1)
+          throw H.wrapException(P.RangeError$value(index, null, null));
+        receiver.splice(index, 0, value);
+      },
       map$1: function(receiver, f) {
         return new H.MappedListIterable(receiver, f, [H.getTypeArgumentByIndex(receiver, 0), null]);
       },
@@ -767,6 +775,17 @@
         if (typeof other !== "number")
           throw H.wrapException(H.argumentErrorValue(other));
         return receiver - other;
+      },
+      $mod: function(receiver, other) {
+        var result = receiver % other;
+        if (result === 0)
+          return 0;
+        if (result > 0)
+          return result;
+        if (other < 0)
+          return result - other;
+        else
+          return result + other;
       },
       _tdivFast$1: function(receiver, other) {
         return (receiver | 0) === receiver ? receiver / other | 0 : this._tdivSlow$1(receiver, other);
@@ -6775,10 +6794,20 @@
       var t1 = document.querySelector("#canvas");
       $.canvas = t1;
       $.ctx = J.getContext$1$x(t1, "2d");
-      t1 = new G.Game(0, null, null, null, null, null, null, null);
+      t1 = new G.Game(0, null, null, null, null, null, null, null, null);
       t1.init$0();
       C.Window_methods.get$animationFrame(window).then$1(t1.get$_onFrame());
     }, "call$0", "snek__main$closure", 0, 0, 1],
+    randomPoint: function(maxX, maxY) {
+      var t1, t2;
+      t1 = C.C__JSRandom.nextDouble$0();
+      if (typeof maxX !== "number")
+        return H.iae(maxX);
+      t2 = C.C__JSRandom.nextDouble$0();
+      if (typeof maxY !== "number")
+        return H.iae(maxY);
+      return new P.Point(t1 * maxX, t2 * maxY, [null]);
+    },
     Keyboard: {
       "^": "Object;_keys",
       Keyboard$0: function() {
@@ -6809,36 +6838,29 @@
       }
     },
     Game: {
-      "^": "Object;_lastTimeStamp,_needsDraw,_headPosition,_headAngle,_bodyPoints,_moveSpeed,_rotateSpeed,_foodPosition",
+      "^": "Object;_lastTimeStamp,_needsDraw,_headPosition,_headAngle,_bodyLength,_bodyPoints,_moveSpeed,_rotateSpeed,_foodPosition",
       init$0: function() {
-        var t1, t2, t3, i, t4, t5;
+        var t1, t2;
         t1 = J.get$width$x($.canvas);
         if (typeof t1 !== "number")
           return t1.$div();
         t2 = J.get$height$x($.canvas);
         if (typeof t2 !== "number")
           return t2.$div();
-        t3 = [null];
-        this._headPosition = new P.Point(t1 / 2, t2 / 2, t3);
+        t2 = new P.Point(t1 / 2, t2 / 2, [null]);
+        this._headPosition = t2;
         this._headAngle = 0;
         this._moveSpeed = 100;
         this._rotateSpeed = 360;
-        this._bodyPoints = [];
-        for (i = 0; i < 100; ++i)
-          this._bodyPoints.push(this._headPosition);
-        t1 = J.get$width$x($.canvas);
-        t2 = J.get$height$x($.canvas);
-        t4 = C.C__JSRandom.nextDouble$0();
-        if (typeof t1 !== "number")
-          return H.iae(t1);
-        t5 = C.C__JSRandom.nextDouble$0();
-        if (typeof t2 !== "number")
-          return H.iae(t2);
-        this._foodPosition = new P.Point(t4 * t1, t5 * t2, t3);
+        this._bodyLength = 100;
+        t1 = [];
+        this._bodyPoints = t1;
+        C.JSArray_methods.insert$2(t1, 0, t2);
+        this._foodPosition = G.randomPoint(J.get$width$x($.canvas), J.get$height$x($.canvas));
         this._needsDraw = true;
       },
       _onFrame$1: [function(delta) {
-        var diff, t1, t2, t3;
+        var diff, t1, t2, t3, dx, dy;
         diff = J.$sub$n(delta, this._lastTimeStamp);
         if (J.$gt$n(diff, 10)) {
           this._lastTimeStamp = delta;
@@ -6851,7 +6873,9 @@
               return H.iae(diff);
             if (typeof t1 !== "number")
               return t1.$sub();
-            this._headAngle = t1 - t2 * diff / 1000;
+            t2 = t1 - t2 * diff / 1000;
+            this._headAngle = t2;
+            this._headAngle = C.JSNumber_methods.$mod(t2, 360);
           } else if ($.$get$keyboard()._keys.containsKey$1(39)) {
             t1 = this._headAngle;
             t2 = this._rotateSpeed;
@@ -6861,7 +6885,9 @@
               return H.iae(diff);
             if (typeof t1 !== "number")
               return t1.$add();
-            this._headAngle = t1 + t2 * diff / 1000;
+            t2 = t1 + t2 * diff / 1000;
+            this._headAngle = t2;
+            this._headAngle = C.JSNumber_methods.$mod(t2, 360);
           }
           t1 = this._headAngle;
           if (typeof t1 !== "number")
@@ -6880,12 +6906,25 @@
           t3 = this._headPosition.$add(0, new P.Point(t1 * t3, t2 * t3, [null]));
           this._headPosition = t3;
           t2 = this._bodyPoints;
-          (t2 && C.JSArray_methods).checkGrowable$1(t2, "insert");
-          t2.splice(0, 0, t3);
+          (t2 && C.JSArray_methods).insert$2(t2, 0, t3);
           t1 = this._bodyPoints;
-          if (0 >= t1.length)
-            return H.ioore(t1, -1);
-          t1.pop();
+          t2 = t1.length;
+          t3 = this._bodyLength;
+          if (typeof t3 !== "number")
+            return H.iae(t3);
+          if (t2 > t3)
+            t1.pop();
+          t1 = this._headPosition;
+          t2 = this._foodPosition;
+          dx = t1.x - t2.x;
+          dy = t1.y - t2.y;
+          if (dx * dx + dy * dy <= 100) {
+            t1 = this._bodyLength;
+            if (typeof t1 !== "number")
+              return t1.$add();
+            this._bodyLength = t1 + 50;
+            this._foodPosition = G.randomPoint(J.get$width$x($.canvas), J.get$height$x($.canvas));
+          }
           this._needsDraw = true;
         }
         if (this._needsDraw === true) {
@@ -6908,7 +6947,7 @@
         C.CanvasRenderingContext2D_methods.fillText$3(t1, "\ud83d\udc01", t2.x, t2.y);
         t2 = $.ctx;
         J.set$strokeStyle$x(t2, "green");
-        t2.lineWidth = 5;
+        t2.lineWidth = 8;
         t2.lineCap = "round";
         t2.lineJoin = "round";
         t2.beginPath();
@@ -6932,7 +6971,7 @@
         t4 = this._headAngle;
         if (typeof t4 !== "number")
           return t4.$mul();
-        t1.ellipse(t3, t2, 10, 5, t4 * 3.141592653589793 / 180, 0, 6.283185307179586, true);
+        t1.ellipse(t3, t2, 10, 7, t4 * 3.141592653589793 / 180, 0, 6.283185307179586, true);
         C.CanvasRenderingContext2D_methods.fill$0(t1);
       }
     }

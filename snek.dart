@@ -47,7 +47,16 @@ class Game {
   // smaller numbers make the game run faster
   // TODO: write a more sophisticated system for advancing frames
   static const num GAME_SPEED = 10;
-  static const int START_BODY_POINTS = 100;
+  static const int START_BODY_LENGTH = 100;
+  // number of segments added to body upon eating food
+  static const int BODY_PER_FOOD = 50;
+  // diameter of food in pixels (for collision detection)
+  static const num FOOD_DIAMETER = 20;
+
+  // constants for drawing
+  static const num HEAD_LENGTH = 20;
+  static const num HEAD_WIDTH = 14;
+  static const num BODY_WIDTH = 8;
 
   num _lastTimeStamp = 0;
   // if true, draw the canvas
@@ -57,6 +66,8 @@ class Game {
   Point _headPosition;
   // angle of head in degrees counter-clockwise from east
   num _headAngle;
+  // maximum length of body in segments (points)
+  int _bodyLength;
   List<Point> _bodyPoints;
   // speed of snake in pixels per second
   num _moveSpeed;
@@ -73,10 +84,9 @@ class Game {
     _headAngle = 0;
     _moveSpeed = 100;
     _rotateSpeed = 360;
+    _bodyLength = START_BODY_LENGTH;
     _bodyPoints = new List();
-    for (int i = 0; i < START_BODY_POINTS; ++i) {
-      _bodyPoints.add(_headPosition);
-    }
+    _bodyPoints.insert(0, _headPosition);
     _placeFood();
     _needsDraw = true;
   }
@@ -110,9 +120,11 @@ class Game {
       // rotate snake head
       if (keyboard.isPressed(KeyCode.LEFT)) {
         _headAngle -= _rotateSpeed * diff / 1000;
+        _headAngle %= 360;
       }
       else if (keyboard.isPressed(KeyCode.RIGHT)) {
         _headAngle += _rotateSpeed * diff / 1000;
+        _headAngle %= 360;
       }
 
       // move head forward
@@ -121,8 +133,20 @@ class Game {
       _headPosition += offset;
 
       // TODO: clone, don't reference...
+      // FIXME: huh? when does dart clone or hold a reference? i
+      // can't tell. this code works, but i don't know why.
       _bodyPoints.insert(0, _headPosition);
-      _bodyPoints.removeLast();
+      if (_bodyPoints.length > _bodyLength) {
+        _bodyPoints.removeLast();
+      }
+
+      // check for food collision
+      if (_headPosition.squaredDistanceTo(_foodPosition) <= (FOOD_DIAMETER/2)*(FOOD_DIAMETER/2)) {
+        // collision detected; eat the food
+        _bodyLength += BODY_PER_FOOD;
+        _placeFood();
+        // TODO: play animation of food disappearing / reappearing
+      }
 
       _needsDraw = true;
     }
@@ -141,7 +165,7 @@ class Game {
     // draw snake body
     // body is drawn before head so head appears above body
     ctx..strokeStyle = 'green'
-      ..lineWidth = 5
+      ..lineWidth = BODY_WIDTH
       ..lineCap = 'round'
       ..lineJoin = 'round'
       ..beginPath()
@@ -154,7 +178,8 @@ class Game {
     // draw snake head
     ctx..fillStyle = 'green'
       ..beginPath()
-      ..ellipse(_headPosition.x, _headPosition.y, 10, 5, _headAngle * PI / 180, 0, 2 * PI, true)
+      ..ellipse(_headPosition.x, _headPosition.y, HEAD_LENGTH/2, HEAD_WIDTH/2,
+        _headAngle * PI / 180, 0, 2 * PI, true)
       ..fill();
   }
 }

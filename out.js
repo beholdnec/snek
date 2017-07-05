@@ -6863,53 +6863,38 @@
         this._needsDraw = true;
       },
       _onFrame$1: [function(delta) {
-        var diff, t1, t2, t3, offset, dx, dy;
+        var diff, inputDirection, t1, t2, t3, offset, dx, dy;
         diff = J.$sub$n(delta, this._lastTimeStamp);
         if (J.$gt$n(diff, 10)) {
           this._lastTimeStamp = delta;
-          if ($.$get$keyboard()._keys.containsKey$1(37)) {
-            t1 = this._headAngle;
-            t2 = this._rotateSpeed;
-            if (typeof t2 !== "number")
-              return t2.$mul();
-            if (typeof diff !== "number")
-              return H.iae(diff);
-            if (typeof t1 !== "number")
-              return t1.$sub();
-            t2 = t1 - t2 * diff / 1000;
-            this._headAngle = t2;
-            this._headAngle = C.JSNumber_methods.$mod(t2, 360);
-          } else if ($.$get$keyboard()._keys.containsKey$1(39)) {
-            t1 = this._headAngle;
-            t2 = this._rotateSpeed;
-            if (typeof t2 !== "number")
-              return t2.$mul();
-            if (typeof diff !== "number")
-              return H.iae(diff);
-            if (typeof t1 !== "number")
-              return t1.$add();
-            t2 = t1 + t2 * diff / 1000;
-            this._headAngle = t2;
-            this._headAngle = C.JSNumber_methods.$mod(t2, 360);
-          }
+          inputDirection = $.$get$keyboard()._keys.containsKey$1(37) ? -1 : 0;
+          if ($.$get$keyboard()._keys.containsKey$1(39))
+            ++inputDirection;
+          t1 = this._headAngle;
+          t2 = this._rotateSpeed;
+          if (typeof t2 !== "number")
+            return H.iae(t2);
+          if (typeof diff !== "number")
+            return H.iae(diff);
+          if (typeof t1 !== "number")
+            return t1.$add();
+          t2 = t1 + inputDirection * t2 * diff / 1000;
+          this._headAngle = t2;
+          t2 = C.JSNumber_methods.$mod(t2, 360);
+          this._headAngle = t2;
+          t2 = Math.cos(t2 * 3.141592653589793 / 180);
           t1 = this._headAngle;
           if (typeof t1 !== "number")
             return t1.$mul();
-          t1 = Math.cos(t1 * 3.141592653589793 / 180);
-          t2 = this._headAngle;
-          if (typeof t2 !== "number")
-            return t2.$mul();
-          t2 = Math.sin(t2 * 3.141592653589793 / 180);
+          t1 = Math.sin(t1 * 3.141592653589793 / 180);
           t3 = this._moveSpeed;
           if (typeof t3 !== "number")
             return t3.$mul();
-          if (typeof diff !== "number")
-            return H.iae(diff);
-          offset = new P.Point(t1, t2, [null]).$mul(0, t3 * diff / 1000);
+          offset = new P.Point(t2, t1, [null]).$mul(0, t3 * diff / 1000);
           t3 = this._headPosition.$add(0, offset);
           this._headPosition = t3;
-          t2 = this._bodyPoints;
-          (t2 && C.JSArray_methods).insert$2(t2, 0, t3);
+          t1 = this._bodyPoints;
+          (t1 && C.JSArray_methods).insert$2(t1, 0, t3);
           t1 = this._bodyPoints;
           t2 = t1.length;
           t3 = this._bodyLength;
@@ -6973,7 +6958,7 @@
         t2 = this._foodPosition;
         C.CanvasRenderingContext2D_methods.fillText$3(t1, "\ud83d\udc01", t2.x, t2.y);
         t2 = $.ctx;
-        J.set$strokeStyle$x(t2, "LawnGreen");
+        J.set$strokeStyle$x(t2, "LimeGreen");
         t2.lineWidth = 8;
         t2.lineCap = "round";
         t2.lineJoin = "round";
@@ -6996,7 +6981,7 @@
         t1 = Math.cos(headAngleRads);
         angleVectorNormal = new P.Point(-Math.sin(headAngleRads), t1, [null]);
         t1 = $.ctx;
-        J.getInterceptor$x(t1).set$fillStyle(t1, "LawnGreen");
+        J.getInterceptor$x(t1).set$fillStyle(t1, "LimeGreen");
         t1.beginPath();
         t2 = this._headPosition;
         t1.ellipse(t2.x, t2.y, 10, 7, headAngleRads, 0, 6.283185307179586, true);

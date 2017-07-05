@@ -54,13 +54,13 @@ class Game {
   static const num FOOD_DIAMETER = 20;
 
   // constants for drawing
-  static const String HEAD_FILL_STYLE = 'LawnGreen';
+  static const String HEAD_FILL_STYLE = 'LimeGreen';
   static const num HEAD_LENGTH = 20;
   static const num HEAD_WIDTH = 14;
   static const String EYE_FILL_STYLE = 'Teal';
   static const num EYE_LENGTH = 6;
   static const num EYE_WIDTH = 3;
-  static const String BODY_STROKE_STYLE = 'LawnGreen';
+  static const String BODY_STROKE_STYLE = 'LimeGreen';
   static const num BODY_WIDTH = 8;
 
   num _lastTimeStamp = 0;
@@ -123,14 +123,15 @@ class Game {
       _lastTimeStamp = delta;
 
       // rotate snake head
+      num inputDirection = 0;
       if (keyboard.isPressed(KeyCode.LEFT)) {
-        _headAngle -= _rotateSpeed * diff / 1000;
-        _headAngle %= 360;
+        inputDirection -= 1;
       }
-      else if (keyboard.isPressed(KeyCode.RIGHT)) {
-        _headAngle += _rotateSpeed * diff / 1000;
-        _headAngle %= 360;
+      if (keyboard.isPressed(KeyCode.RIGHT)) {
+        inputDirection += 1;
       }
+      _headAngle += inputDirection * _rotateSpeed * diff / 1000;
+      _headAngle %= 360;
 
       // move head forward
       final Point offset = new Point(cos(_headAngle * PI / 180), sin(_headAngle * PI / 180))

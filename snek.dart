@@ -2,8 +2,6 @@ import 'dart:html';
 import 'dart:math';
 import 'dart:collection';
 
-const int CELL_SIZE = 10;
-
 CanvasElement canvas;
 CanvasRenderingContext2D ctx;
 Keyboard keyboard = new Keyboard();
@@ -20,9 +18,81 @@ void clear() {
     ..fillRect(0, 0, canvas.width, canvas.height);
 }
 
+double dotProduct(Point a, Point b) {
+  return a.x * b.x + a.y * b.y;
+}
+
+double crossProductMagnitude(Point a, Point b) {
+  return a.x * b.y - a.y * b.x;
+}
+
+Point pointAtAngle(num angle) {
+  return new Point(cos(angle), sin(angle));
+}
+
 Point randomPoint(num maxX, num maxY) {
   Random r = new Random();
   return new Point(r.nextDouble() * maxX, r.nextDouble() * maxY);
+}
+
+// Return squared distance from point p to line segment s1 -> s2. The squared
+// distance is returned, as taking the square root is expensive and often not
+// needed.
+// Ref: <http://paulbourke.net/geometry/pointlineplane/>
+double squaredDistancePointToLineSegment(Point p, Point s1, Point s2) {
+  final double s1s2SquaredDistance = s1.squaredDistanceTo(s2);
+
+  // If line segment is actually a point, compute distance between point and p.
+  if (s1s2SquaredDistance <= 0) {
+    return s1.squaredDistanceTo(p);
+  }
+
+  final Point s1s2 = s2 - s1;
+  final Point s1p = p - s1;
+
+  final double u = dotProduct(s1p, s1s2) / s1s2SquaredDistance;
+  if (u <= 0) {
+    return s1.squaredDistanceTo(p);
+  } else if (u >= 1) {
+    return s2.squaredDistanceTo(p);
+  }
+
+  return (s1 + s1s2 * u).squaredDistanceTo(p);
+}
+
+// Return whether point p with heading v will collide with line segment s1 ->
+// s2. To be precise, this functions checks whether the distance between p and
+// line segment s1 -> s2 decreases as p travels with velocity v.
+bool willCollide(Point p, Point v, Point s1, Point s2) {
+  final Point s1s2 = s2 - s1;
+  final Point s1p = p - s1;
+  final Point s2p = p - s2;
+
+  final double s1s2SquaredDistance = s1.squaredDistanceTo(s2);
+
+  if (s1s2SquaredDistance <= 0) {
+    // Line segment is a point.
+
+    // Return false if p is exactly at s1.
+    if (s1p.x == 0 && s1p.y == 0) {
+      return false;
+    }
+
+    // Return true if p is getting closer to s1.
+    return dotProduct(v, s1p) < 0;
+  }
+
+  final double u = dotProduct(s1p, s1s2) / s1s2SquaredDistance;
+  if (u <= 0) {
+    // p is nearest to s1. Return true if p is getting closer to s1.
+    return dotProduct(v, s1p) < 0;
+  } else if (u >= 1) {
+    // p is nearest to s2. Return true if p is getting closer to s2.
+    return dotProduct(v, s2p) < 0;
+  }
+
+  return dotProduct(s1s2 * (dotProduct(v, s1s2) / s1s2SquaredDistance) - v,
+    s1 + s1s2 * u - p) < 0;
 }
 
 class Keyboard {
@@ -52,6 +122,8 @@ class Game {
   static const int BODY_PER_FOOD = 50;
   // diameter of food in pixels (for collision detection)
   static const num FOOD_DIAMETER = 20;
+  // distance between head and body to be considered self-colliding
+  static const num BODY_COLLIDE_DISTANCE = 8;
 
   // constants for drawing
   static const String HEAD_FILL_STYLE = 'LimeGreen';
@@ -142,13 +214,13 @@ class Game {
       }
 
       // move head forward
-      final Point offset = new Point(cos(_headAngle * PI / 180), sin(_headAngle * PI / 180))
-        * (_moveSpeed * diff / 1000);
+      final Point offset = pointAtAngle(_headAngle * PI / 180) * (_moveSpeed * diff / 1000);
       _headPosition += offset;
 
-      // check for wall collision
+      // check for wall  or body collision
       if (_headPosition.x < 0 || _headPosition.y < 0 ||
-        _headPosition.x >= canvas.width || _headPosition.y >= canvas.height) {
+        _headPosition.x >= canvas.width || _headPosition.y >= canvas.height ||
+        _isSnakeSelfColliding()) {
         // out of bounds; reset the game
         // TODO: carefully ensure game state is cleaned up and reset; abort
         // the current update
@@ -164,6 +236,26 @@ class Game {
 
       _needsDraw = true;
     }
+  }
+
+  bool _isSnakeSelfColliding() {
+    if (_bodyPoints.length < 2) {
+      return false;
+    }
+
+    final Point v = pointAtAngle(_headAngle * PI / 180);
+
+    for (int i = 0; i < _bodyPoints.length - 2; ++i) {
+      final Point s1 = _bodyPoints[i];
+      final Point s2 = _bodyPoints[i+1];
+      if (squaredDistancePointToLineSegment(_headPosition, s1, s2) <
+        BODY_COLLIDE_DISTANCE*BODY_COLLIDE_DISTANCE &&
+        willCollide(_headPosition, v, s1, s2)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   void _draw() {
@@ -212,5 +304,25 @@ class Game {
       ..ellipse(rightEyePosition.x, rightEyePosition.y, EYE_LENGTH/2, EYE_WIDTH/2,
         headAngleRads, 0, 2 * PI, true)
       ..fill();
+
+    // draw text for testing
+    // Point p = _headPosition;
+    // Point s1 = new Point(canvas.width / 4, canvas.height / 4);
+    // Point s2 = new Point(canvas.width * 3/4, canvas.height * 3/4);
+    // ctx..strokeStyle = 'black'
+    //   ..lineWidth = 1
+    //   ..beginPath()
+    //   ..moveTo(s1.x, s1.y)..lineTo(s2.x, s2.y)
+    //   ..stroke();
+    // double testDist = sqrt(squaredDistancePointToLineSegment(_headPosition, s1, s2));
+    // final bool willCollide_ = willCollide(_headPosition, pointAtAngle(_headAngle * PI / 180),
+    //   s1, s2);
+    // final bool isColliding = willCollide_ && testDist < 8;
+    // ctx..textAlign = 'left'
+    //   ..textBaseline = 'top'
+    //   ..fillText('Distance to diagonal: ' + testDist.toString(), 0, 0)
+    //   ..fillText('Will collide: ' + willCollide_.toString(), 0, 16)
+    //   ..fillText('Is colliding: ' + isColliding.toString(), 0, 32)
+    //   ..fillText('Is snake self-colliding: ' + _isSnakeSelfColliding().toString(), 0, 48);
   }
 }

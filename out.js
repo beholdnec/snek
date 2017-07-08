@@ -925,52 +925,6 @@
         return this.toList$1$growable($receiver, true);
       }
     },
-    SubListIterable: {
-      "^": "ListIterable;_iterable,_start,_endOrLength,$ti",
-      get$_endIndex: function() {
-        var $length = J.get$length$asx(this._iterable);
-        return $length;
-      },
-      get$_startIndex: function() {
-        var $length, t1;
-        $length = J.get$length$asx(this._iterable);
-        t1 = this._start;
-        if (t1 > $length)
-          return $length;
-        return t1;
-      },
-      get$length: function(_) {
-        var $length, t1;
-        $length = J.get$length$asx(this._iterable);
-        t1 = this._start;
-        if (t1 >= $length)
-          return 0;
-        return $length - t1;
-      },
-      elementAt$1: function(_, index) {
-        var realIndex, t1;
-        realIndex = this.get$_startIndex() + index;
-        if (index >= 0) {
-          t1 = this.get$_endIndex();
-          if (typeof t1 !== "number")
-            return H.iae(t1);
-          t1 = realIndex >= t1;
-        } else
-          t1 = true;
-        if (t1)
-          throw H.wrapException(P.IndexError$(index, this, "index", null, null));
-        return J.elementAt$1$ax(this._iterable, realIndex);
-      },
-      SubListIterable$3: function(_iterable, _start, _endOrLength, $E) {
-      },
-      static: {
-        SubListIterable$: function(_iterable, _start, _endOrLength, $E) {
-          var t1 = new H.SubListIterable(_iterable, _start, _endOrLength, [$E]);
-          t1.SubListIterable$3(_iterable, _start, _endOrLength, $E);
-          return t1;
-        }
-      }
-    },
     ListIterator: {
       "^": "Object;_iterable,__internal$_length,__internal$_index,__internal$_current",
       get$current: function() {
@@ -6547,7 +6501,7 @@
       }
     },
     Point: {
-      "^": "Object;x>,y>,$ti",
+      "^": "Object;x>,y,$ti",
       toString$0: function(_) {
         return "Point(" + H.S(this.x) + ", " + H.S(this.y) + ")";
       },
@@ -6573,6 +6527,12 @@
       },
       $mul: function(_, factor) {
         return new P.Point(this.x * factor, this.y * factor, this.$ti);
+      },
+      squaredDistanceTo$1: function(other) {
+        var dx, dy;
+        dx = this.x - other.x;
+        dy = this.y - other.y;
+        return dx * dx + dy * dy;
       }
     }
   }], ["dart.dom.svg", "dart:svg",, P, {
@@ -6588,100 +6548,92 @@
       "%": "SVGAnimateElement|SVGAnimateMotionElement|SVGAnimateTransformElement|SVGAnimationElement|SVGSetElement"
     },
     FEBlendElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEBlendElement"
     },
     FEColorMatrixElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEColorMatrixElement"
     },
     FEComponentTransferElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEComponentTransferElement"
     },
     FECompositeElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFECompositeElement"
     },
     FEConvolveMatrixElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEConvolveMatrixElement"
     },
     FEDiffuseLightingElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEDiffuseLightingElement"
     },
     FEDisplacementMapElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEDisplacementMapElement"
     },
     FEFloodElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEFloodElement"
     },
     FEGaussianBlurElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEGaussianBlurElement"
     },
     FEImageElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEImageElement"
     },
     FEMergeElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEMergeElement"
     },
     FEMorphologyElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEMorphologyElement"
     },
     FEOffsetElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFEOffsetElement"
     },
-    FEPointLightElement: {
-      "^": "SvgElement;x=,y=",
-      "%": "SVGFEPointLightElement"
-    },
     FESpecularLightingElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFESpecularLightingElement"
     },
-    FESpotLightElement: {
-      "^": "SvgElement;x=,y=",
-      "%": "SVGFESpotLightElement"
-    },
     FETileElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFETileElement"
     },
     FETurbulenceElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFETurbulenceElement"
     },
     FilterElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGFilterElement"
     },
     ForeignObjectElement: {
-      "^": "GraphicsElement;height=,width=,x=,y=",
+      "^": "GraphicsElement;height=,width=",
       "%": "SVGForeignObjectElement"
     },
     GeometryElement: {
@@ -6694,7 +6646,7 @@
       "%": "SVGClipPathElement|SVGDefsElement|SVGGElement|SVGSwitchElement;SVGGraphicsElement"
     },
     ImageElement0: {
-      "^": "GraphicsElement;height=,width=,x=,y=",
+      "^": "GraphicsElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGImageElement"
     },
@@ -6704,17 +6656,17 @@
       "%": "SVGMarkerElement"
     },
     MaskElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGMaskElement"
     },
     PatternElement: {
-      "^": "SvgElement;height=,width=,x=,y=",
+      "^": "SvgElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGPatternElement"
     },
     RectElement: {
-      "^": "GeometryElement;height=,width=,x=,y=",
+      "^": "GeometryElement;height=,width=",
       "%": "SVGRectElement"
     },
     ScriptElement0: {
@@ -6725,10 +6677,10 @@
     SvgElement: {
       "^": "Element;",
       $isInterceptor: 1,
-      "%": "SVGComponentTransferFunctionElement|SVGDescElement|SVGDiscardElement|SVGFEDistantLightElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGMetadataElement|SVGStopElement|SVGStyleElement|SVGTitleElement;SVGElement"
+      "%": "SVGComponentTransferFunctionElement|SVGDescElement|SVGDiscardElement|SVGFEDistantLightElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGFEPointLightElement|SVGFESpotLightElement|SVGMetadataElement|SVGStopElement|SVGStyleElement|SVGTitleElement;SVGElement"
     },
     SvgSvgElement: {
-      "^": "GraphicsElement;height=,width=,x=,y=",
+      "^": "GraphicsElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGSVGElement"
     },
@@ -6739,19 +6691,15 @@
     },
     TextContentElement: {
       "^": "GraphicsElement;",
-      "%": ";SVGTextContentElement"
+      "%": "SVGTSpanElement|SVGTextElement|SVGTextPositioningElement;SVGTextContentElement"
     },
     TextPathElement: {
       "^": "TextContentElement;",
       $isInterceptor: 1,
       "%": "SVGTextPathElement"
     },
-    TextPositioningElement: {
-      "^": "TextContentElement;x=,y=",
-      "%": "SVGTSpanElement|SVGTextElement|SVGTextPositioningElement"
-    },
     UseElement: {
-      "^": "GraphicsElement;height=,width=,x=,y=",
+      "^": "GraphicsElement;height=,width=",
       $isInterceptor: 1,
       "%": "SVGUseElement"
     },
@@ -6811,6 +6759,52 @@
         return H.iae(maxY);
       return new P.Point(t1 * maxX, t2 * maxY, [null]);
     },
+    squaredDistancePointToLineSegment: function(p, s1, s2) {
+      var s1s2SquaredDistance, t1, t2, t3, t4, u;
+      s1s2SquaredDistance = s1.squaredDistanceTo$1(s2);
+      if (s1s2SquaredDistance <= 0)
+        return s1.squaredDistanceTo$1(p);
+      t1 = s2.x;
+      t2 = s1.x;
+      t1 -= t2;
+      t3 = s2.y;
+      t4 = s1.y;
+      t3 -= t4;
+      u = ((p.x - t2) * t1 + (p.y - t4) * t3) / s1s2SquaredDistance;
+      if (u <= 0)
+        return s1.squaredDistanceTo$1(p);
+      else if (u >= 1)
+        return s2.squaredDistanceTo$1(p);
+      return new P.Point(t2 + t1 * u, t4 + t3 * u, [H.getTypeArgumentByIndex(s1, 0)]).squaredDistanceTo$1(p);
+    },
+    willCollide: function(p, v, s1, s2) {
+      var t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, s1s2SquaredDistance, u;
+      t1 = s2.x;
+      t2 = s1.x;
+      t3 = t1 - t2;
+      t4 = s2.y;
+      t5 = s1.y;
+      t6 = t4 - t5;
+      t7 = p.x;
+      t8 = t7 - t2;
+      t9 = p.y;
+      t10 = t9 - t5;
+      s1s2SquaredDistance = s1.squaredDistanceTo$1(s2);
+      if (s1s2SquaredDistance <= 0) {
+        if (t8 === 0 && t10 === 0)
+          return false;
+        return v.x * t8 + v.y * t10 < 0;
+      }
+      u = (t8 * t3 + t10 * t6) / s1s2SquaredDistance;
+      if (u <= 0)
+        return v.x * t8 + v.y * t10 < 0;
+      else if (u >= 1)
+        return v.x * (t7 - t1) + v.y * (t9 - t4) < 0;
+      t1 = v.x;
+      t4 = v.y;
+      t8 = (t1 * t3 + t4 * t6) / s1s2SquaredDistance;
+      return (t3 * t8 - t1) * (t2 + t3 * u - t7) + (t6 * t8 - t4) * (t5 + t6 * u - t9) < 0;
+    },
     Keyboard: {
       "^": "Object;_keys",
       Keyboard$0: function() {
@@ -6863,7 +6857,7 @@
         this._needsDraw = true;
       },
       _onFrame$1: [function(delta) {
-        var diff, inputDirection, t1, t2, t3, offset, dx, dy;
+        var diff, inputDirection, t1, t2, t3, offset;
         diff = J.$sub$n(delta, this._lastTimeStamp);
         if (J.$gt$n(diff, 10)) {
           this._lastTimeStamp = delta;
@@ -6880,21 +6874,9 @@
             return t1.$add();
           t2 = t1 + inputDirection * t2 * diff / 1000;
           this._headAngle = t2;
-          t2 = C.JSNumber_methods.$mod(t2, 360);
-          this._headAngle = t2;
-          t2 = Math.cos(t2 * 3.141592653589793 / 180);
-          t1 = this._headAngle;
-          if (typeof t1 !== "number")
-            return t1.$mul();
-          t1 = Math.sin(t1 * 3.141592653589793 / 180);
-          t3 = this._moveSpeed;
-          if (typeof t3 !== "number")
-            return t3.$mul();
-          offset = new P.Point(t2, t1, [null]).$mul(0, t3 * diff / 1000);
-          t3 = this._headPosition.$add(0, offset);
-          this._headPosition = t3;
-          t1 = this._bodyPoints;
-          (t1 && C.JSArray_methods).insert$2(t1, 0, t3);
+          this._headAngle = C.JSNumber_methods.$mod(t2, 360);
+          t2 = this._bodyPoints;
+          (t2 && C.JSArray_methods).insert$2(t2, 0, this._headPosition);
           t1 = this._bodyPoints;
           t2 = t1.length;
           t3 = this._bodyLength;
@@ -6902,20 +6884,30 @@
             return H.iae(t3);
           if (t2 > t3)
             t1.pop();
-          t1 = this._headPosition;
-          t2 = t1.x;
-          if (!(t2 < 0))
-            if (!(t1.y < 0)) {
-              t1 = J.get$width$x($.canvas);
-              if (typeof t1 !== "number")
-                return H.iae(t1);
-              if (!(t2 >= t1)) {
+          t1 = this._headAngle;
+          if (typeof t1 !== "number")
+            return t1.$mul();
+          t1 = t1 * 3.141592653589793 / 180;
+          t2 = Math.cos(t1);
+          t1 = Math.sin(t1);
+          t3 = this._moveSpeed;
+          if (typeof t3 !== "number")
+            return t3.$mul();
+          offset = new P.Point(t2, t1, [null]).$mul(0, t3 * diff / 1000);
+          t3 = this._headPosition.$add(0, offset);
+          this._headPosition = t3;
+          t1 = t3.x;
+          if (!(t1 < 0))
+            if (!(t3.y < 0)) {
+              t2 = J.get$width$x($.canvas);
+              if (typeof t2 !== "number")
+                return H.iae(t2);
+              if (!(t1 >= t2)) {
                 t1 = this._headPosition.y;
                 t2 = J.get$height$x($.canvas);
                 if (typeof t2 !== "number")
                   return H.iae(t2);
-                t2 = t1 >= t2;
-                t1 = t2;
+                t1 = t1 >= t2 || this._isSnakeSelfColliding$0();
               } else
                 t1 = true;
             } else
@@ -6924,18 +6916,12 @@
             t1 = true;
           if (t1)
             this.init$0();
-          else {
-            t1 = this._headPosition;
-            t2 = this._foodPosition;
-            dx = t1.x - t2.x;
-            dy = t1.y - t2.y;
-            if (dx * dx + dy * dy <= 100) {
-              t1 = this._bodyLength;
-              if (typeof t1 !== "number")
-                return t1.$add();
-              this._bodyLength = t1 + 50;
-              this._foodPosition = G.randomPoint(J.get$width$x($.canvas), J.get$height$x($.canvas));
-            }
+          else if (this._headPosition.squaredDistanceTo$1(this._foodPosition) <= 100) {
+            t1 = this._bodyLength;
+            if (typeof t1 !== "number")
+              return t1.$add();
+            this._bodyLength = t1 + 50;
+            this._foodPosition = G.randomPoint(J.get$width$x($.canvas), J.get$height$x($.canvas));
           }
           this._needsDraw = true;
         }
@@ -6945,8 +6931,26 @@
         }
         C.Window_methods.get$animationFrame(window).then$1(this.get$_onFrame());
       }, "call$1", "get$_onFrame", 2, 0, 13],
+      _isSnakeSelfColliding$0: function() {
+        var t1, v, i, s1, s2;
+        if (this._bodyPoints.length < 2)
+          return false;
+        t1 = this._headAngle;
+        if (typeof t1 !== "number")
+          return t1.$mul();
+        t1 = t1 * 3.141592653589793 / 180;
+        v = new P.Point(Math.cos(t1), Math.sin(t1), [null]);
+        for (i = 0; t1 = this._bodyPoints, i < t1.length - 2;) {
+          s1 = t1[i];
+          ++i;
+          s2 = t1[i];
+          if (G.squaredDistancePointToLineSegment(this._headPosition, s1, s2) < 64 && G.willCollide(this._headPosition, v, s1, s2))
+            return true;
+        }
+        return false;
+      },
       _draw$0: function() {
-        var t1, t2, pt, headAngleRads, angleVectorNormal, leftEyePosition, rightEyePosition;
+        var t1, t2, _i, pt, headAngleRads, angleVectorNormal, leftEyePosition, rightEyePosition;
         t1 = $.ctx;
         J.set$fillStyle$x(t1, "white");
         t1.fillRect(0, 0, J.get$width$x($.canvas), J.get$height$x($.canvas));
@@ -6963,15 +6967,11 @@
         t2.lineCap = "round";
         t2.lineJoin = "round";
         t2.beginPath();
-        t1 = this._bodyPoints;
-        if (0 >= t1.length)
-          return H.ioore(t1, 0);
-        t1 = t1[0];
+        t1 = this._headPosition;
         t2.moveTo(t1.x, t1.y);
-        for (t1 = this._bodyPoints, t1.toString, t1 = H.SubListIterable$(t1, 1, null, H.getTypeArgumentByIndex(t1, 0)), t1 = new H.ListIterator(t1, t1.get$length(t1), 0, null); t1.moveNext$0();) {
-          pt = t1.__internal$_current;
-          t2 = J.getInterceptor$x(pt);
-          J.lineTo$2$x($.ctx, t2.get$x(pt), t2.get$y(pt));
+        for (t1 = this._bodyPoints, t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i) {
+          pt = t1[_i];
+          J.lineTo$2$x($.ctx, pt.x, pt.y);
         }
         J.stroke$0$x($.ctx);
         t1 = this._headAngle;

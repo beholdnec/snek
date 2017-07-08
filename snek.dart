@@ -133,18 +133,18 @@ class Game {
       _headAngle += inputDirection * _rotateSpeed * diff / 1000;
       _headAngle %= 360;
 
-      // move head forward
-      final Point offset = new Point(cos(_headAngle * PI / 180), sin(_headAngle * PI / 180))
-        * (_moveSpeed * diff / 1000);
-      _headPosition += offset;
-
-      // TODO: clone, don't reference...
-      // FIXME: huh? when does dart clone or hold a reference? i
-      // can't tell. this code works, but i don't know why.
+      // add new body point at head
+      // Dart doesn't store a reference to _headPosition; instead, _headPosition
+      // is cloned. Therefore, this is safe.
       _bodyPoints.insert(0, _headPosition);
       if (_bodyPoints.length > _bodyLength) {
         _bodyPoints.removeLast();
       }
+
+      // move head forward
+      final Point offset = new Point(cos(_headAngle * PI / 180), sin(_headAngle * PI / 180))
+        * (_moveSpeed * diff / 1000);
+      _headPosition += offset;
 
       // check for wall collision
       if (_headPosition.x < 0 || _headPosition.y < 0 ||
@@ -183,8 +183,8 @@ class Game {
       ..lineCap = 'round'
       ..lineJoin = 'round'
       ..beginPath()
-      ..moveTo(_bodyPoints[0].x, _bodyPoints[0].y);
-    for (Point pt in _bodyPoints.skip(1)) {
+      ..moveTo(_headPosition.x, _headPosition.y);
+    for (Point pt in _bodyPoints) {
       ctx..lineTo(pt.x, pt.y);
     }
     ctx..stroke();

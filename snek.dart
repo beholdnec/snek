@@ -114,9 +114,16 @@ class Keyboard {
 }
 
 class Game {
-  // smaller numbers make the game run faster
-  // TODO: write a more sophisticated system for advancing frames
-  static const num GAME_SPEED = 10;
+  // frequency of game in ticks per second
+  // Note this is frequency of physics and game logic, NOT frame rate
+  // It is important for the game to tick at a rapid, constant rate, as doing
+  // otherwise may cause physics glitches.
+  static const int TICKS_PER_SECOND = 120;
+  static const num TICK_PERIOD_MILLIS = 1000 / TICKS_PER_SECOND;
+  // maximum number of ticks per call to _update (i.e. per frame)
+  // If _update is called too slowly, the game will run in slow motion.
+  static const int MAX_TICKS_PER_FRAME = 12;
+  // number of segments in body when starting game
   static const int START_BODY_LENGTH = 100;
   // number of segments added to body upon eating food
   static const int BODY_PER_FOOD = 50;
@@ -166,6 +173,7 @@ class Game {
     _bodyPoints.insert(0, _headPosition);
     _placeFood();
     _needsDraw = true;
+    _lastTimeStamp = window.performance.now();
   }
 
   void _placeFood() {
@@ -188,54 +196,68 @@ class Game {
     run();
   }
 
-  void _update(num delta) {
-    final num diff = delta - _lastTimeStamp;
-
-    if (diff > GAME_SPEED) {
-      _lastTimeStamp = delta;
-
-      // rotate snake head
-      num inputDirection = 0;
-      if (keyboard.isPressed(KeyCode.LEFT)) {
-        inputDirection -= 1;
-      }
-      if (keyboard.isPressed(KeyCode.RIGHT)) {
-        inputDirection += 1;
-      }
-      _headAngle += inputDirection * _rotateSpeed * diff / 1000;
-      _headAngle %= 360;
-
-      // add new body point at head
-      // Dart doesn't store a reference to _headPosition; instead, _headPosition
-      // is cloned. Therefore, this is safe.
-      _bodyPoints.insert(0, _headPosition);
-      if (_bodyPoints.length > _bodyLength) {
-        _bodyPoints.removeLast();
+  void _update(num timestamp) {
+    int tickNum;
+    for (tickNum = 0; tickNum < MAX_TICKS_PER_FRAME; ++tickNum) {
+      final num delta = timestamp - _lastTimeStamp;
+      if (delta < TICK_PERIOD_MILLIS) {
+        break;
       }
 
-      // move head forward
-      final Point offset = pointAtAngle(_headAngle * PI / 180) * (_moveSpeed * diff / 1000);
-      _headPosition += offset;
+      _tick(TICK_PERIOD_MILLIS);
 
-      // check for wall  or body collision
-      if (_headPosition.x < 0 || _headPosition.y < 0 ||
-        _headPosition.x >= canvas.width || _headPosition.y >= canvas.height ||
-        _isSnakeSelfColliding()) {
-        // out of bounds; reset the game
-        // TODO: carefully ensure game state is cleaned up and reset; abort
-        // the current update
-        init();
-      }
-      // check for food collision
-      else if (_headPosition.squaredDistanceTo(_foodPosition) <= (FOOD_DIAMETER/2)*(FOOD_DIAMETER/2)) {
-        // collision detected; eat the food
-        _bodyLength += BODY_PER_FOOD;
-        _placeFood();
-        // TODO: play animation of food disappearing / reappearing
-      }
-
-      _needsDraw = true;
+      _lastTimeStamp += TICK_PERIOD_MILLIS;
     }
+
+    // if too many ticks occurred, move game timestamp all the way up to current
+    // timestamp
+    if (tickNum >= MAX_TICKS_PER_FRAME) {
+      _lastTimeStamp = timestamp;
+    }
+  }
+
+  void _tick(num delta) {
+    // rotate snake head
+    num inputDirection = 0;
+    if (keyboard.isPressed(KeyCode.LEFT)) {
+      inputDirection -= 1;
+    }
+    if (keyboard.isPressed(KeyCode.RIGHT)) {
+      inputDirection += 1;
+    }
+    _headAngle += inputDirection * _rotateSpeed * delta / 1000;
+    _headAngle %= 360;
+
+    // add new body point at head
+    // Dart doesn't store a reference to _headPosition; instead, _headPosition
+    // is cloned. Therefore, this is safe.
+    _bodyPoints.insert(0, _headPosition);
+    if (_bodyPoints.length > _bodyLength) {
+      _bodyPoints.removeLast();
+    }
+
+    // move head forward
+    final Point offset = pointAtAngle(_headAngle * PI / 180) * (_moveSpeed * delta / 1000);
+    _headPosition += offset;
+
+    // check for wall  or body collision
+    if (_headPosition.x < 0 || _headPosition.y < 0 ||
+      _headPosition.x >= canvas.width || _headPosition.y >= canvas.height ||
+      _isSnakeSelfColliding()) {
+      // out of bounds; reset the game
+      // TODO: carefully ensure game state is cleaned up and reset; abort
+      // the current update
+      init();
+    }
+    // check for food collision
+    else if (_headPosition.squaredDistanceTo(_foodPosition) <= (FOOD_DIAMETER/2)*(FOOD_DIAMETER/2)) {
+      // collision detected; eat the food
+      _bodyLength += BODY_PER_FOOD;
+      _placeFood();
+      // TODO: play animation of food disappearing / reappearing
+    }
+
+    _needsDraw = true;
   }
 
   bool _isSnakeSelfColliding() {

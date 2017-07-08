@@ -816,11 +816,6 @@
           throw H.wrapException(H.argumentErrorValue(other));
         return receiver < other;
       },
-      $gt: function(receiver, other) {
-        if (typeof other !== "number")
-          throw H.wrapException(H.argumentErrorValue(other));
-        return receiver > other;
-      },
       $isnum: 1
     },
     JSInt: {
@@ -5850,9 +5845,6 @@
       $lt: function(_, other) {
         return C.JSInt_methods.$lt(this._duration, other.get$_duration());
       },
-      $gt: function(_, other) {
-        return C.JSInt_methods.$gt(this._duration, other.get$_duration());
-      },
       $eq: function(_, other) {
         if (other == null)
           return false;
@@ -6298,7 +6290,7 @@
       _removeEventListener$3: function(receiver, type, listener, options) {
         return receiver.removeEventListener(type, H.convertDartClosureToJS(listener, 1), false);
       },
-      "%": "MediaStream;EventTarget"
+      "%": "MediaStream|Performance;EventTarget"
     },
     FormElement: {
       "^": "HtmlElement;length=",
@@ -6501,7 +6493,7 @@
       }
     },
     Point: {
-      "^": "Object;x>,y,$ti",
+      "^": "Object;x>,y>,$ti",
       toString$0: function(_) {
         return "Point(" + H.S(this.x) + ", " + H.S(this.y) + ")";
       },
@@ -6523,7 +6515,15 @@
         return new P.Point(this.x + J.get$x$x(other), this.y + other.y, this.$ti);
       },
       $sub: function(_, other) {
-        return new P.Point(this.x - J.get$x$x(other), this.y - other.y, this.$ti);
+        var t1, t2;
+        t1 = J.getInterceptor$x(other);
+        t2 = t1.get$x(other);
+        if (typeof t2 !== "number")
+          return H.iae(t2);
+        t1 = t1.get$y(other);
+        if (typeof t1 !== "number")
+          return H.iae(t1);
+        return new P.Point(this.x - t2, this.y - t1, this.$ti);
       },
       $mul: function(_, factor) {
         return new P.Point(this.x * factor, this.y * factor, this.$ti);
@@ -6548,92 +6548,100 @@
       "%": "SVGAnimateElement|SVGAnimateMotionElement|SVGAnimateTransformElement|SVGAnimationElement|SVGSetElement"
     },
     FEBlendElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEBlendElement"
     },
     FEColorMatrixElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEColorMatrixElement"
     },
     FEComponentTransferElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEComponentTransferElement"
     },
     FECompositeElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFECompositeElement"
     },
     FEConvolveMatrixElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEConvolveMatrixElement"
     },
     FEDiffuseLightingElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEDiffuseLightingElement"
     },
     FEDisplacementMapElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEDisplacementMapElement"
     },
     FEFloodElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEFloodElement"
     },
     FEGaussianBlurElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEGaussianBlurElement"
     },
     FEImageElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEImageElement"
     },
     FEMergeElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEMergeElement"
     },
     FEMorphologyElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEMorphologyElement"
     },
     FEOffsetElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFEOffsetElement"
     },
+    FEPointLightElement: {
+      "^": "SvgElement;x=,y=",
+      "%": "SVGFEPointLightElement"
+    },
     FESpecularLightingElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFESpecularLightingElement"
     },
+    FESpotLightElement: {
+      "^": "SvgElement;x=,y=",
+      "%": "SVGFESpotLightElement"
+    },
     FETileElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFETileElement"
     },
     FETurbulenceElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFETurbulenceElement"
     },
     FilterElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGFilterElement"
     },
     ForeignObjectElement: {
-      "^": "GraphicsElement;height=,width=",
+      "^": "GraphicsElement;height=,width=,x=,y=",
       "%": "SVGForeignObjectElement"
     },
     GeometryElement: {
@@ -6646,7 +6654,7 @@
       "%": "SVGClipPathElement|SVGDefsElement|SVGGElement|SVGSwitchElement;SVGGraphicsElement"
     },
     ImageElement0: {
-      "^": "GraphicsElement;height=,width=",
+      "^": "GraphicsElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGImageElement"
     },
@@ -6656,17 +6664,17 @@
       "%": "SVGMarkerElement"
     },
     MaskElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGMaskElement"
     },
     PatternElement: {
-      "^": "SvgElement;height=,width=",
+      "^": "SvgElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGPatternElement"
     },
     RectElement: {
-      "^": "GeometryElement;height=,width=",
+      "^": "GeometryElement;height=,width=,x=,y=",
       "%": "SVGRectElement"
     },
     ScriptElement0: {
@@ -6677,10 +6685,10 @@
     SvgElement: {
       "^": "Element;",
       $isInterceptor: 1,
-      "%": "SVGComponentTransferFunctionElement|SVGDescElement|SVGDiscardElement|SVGFEDistantLightElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGFEPointLightElement|SVGFESpotLightElement|SVGMetadataElement|SVGStopElement|SVGStyleElement|SVGTitleElement;SVGElement"
+      "%": "SVGComponentTransferFunctionElement|SVGDescElement|SVGDiscardElement|SVGFEDistantLightElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGMetadataElement|SVGStopElement|SVGStyleElement|SVGTitleElement;SVGElement"
     },
     SvgSvgElement: {
-      "^": "GraphicsElement;height=,width=",
+      "^": "GraphicsElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGSVGElement"
     },
@@ -6691,15 +6699,19 @@
     },
     TextContentElement: {
       "^": "GraphicsElement;",
-      "%": "SVGTSpanElement|SVGTextElement|SVGTextPositioningElement;SVGTextContentElement"
+      "%": ";SVGTextContentElement"
     },
     TextPathElement: {
       "^": "TextContentElement;",
       $isInterceptor: 1,
       "%": "SVGTextPathElement"
     },
+    TextPositioningElement: {
+      "^": "TextContentElement;x=,y=",
+      "%": "SVGTSpanElement|SVGTextElement|SVGTextPositioningElement"
+    },
     UseElement: {
-      "^": "GraphicsElement;height=,width=",
+      "^": "GraphicsElement;height=,width=,x=,y=",
       $isInterceptor: 1,
       "%": "SVGUseElement"
     },
@@ -6855,82 +6867,96 @@
         C.JSArray_methods.insert$2(t1, 0, t2);
         this._foodPosition = G.randomPoint(J.get$width$x($.canvas), J.get$height$x($.canvas));
         this._needsDraw = true;
+        this._lastTimeStamp = window.performance.now();
       },
       _onFrame$1: [function(delta) {
-        var diff, inputDirection, t1, t2, t3, offset;
-        diff = J.$sub$n(delta, this._lastTimeStamp);
-        if (J.$gt$n(diff, 10)) {
-          this._lastTimeStamp = delta;
-          inputDirection = $.$get$keyboard()._keys.containsKey$1(37) ? -1 : 0;
-          if ($.$get$keyboard()._keys.containsKey$1(39))
-            ++inputDirection;
-          t1 = this._headAngle;
-          t2 = this._rotateSpeed;
-          if (typeof t2 !== "number")
-            return H.iae(t2);
-          if (typeof diff !== "number")
-            return H.iae(diff);
-          if (typeof t1 !== "number")
-            return t1.$add();
-          t2 = t1 + inputDirection * t2 * diff / 1000;
-          this._headAngle = t2;
-          this._headAngle = C.JSNumber_methods.$mod(t2, 360);
-          t2 = this._bodyPoints;
-          (t2 && C.JSArray_methods).insert$2(t2, 0, this._headPosition);
-          t1 = this._bodyPoints;
-          t2 = t1.length;
-          t3 = this._bodyLength;
-          if (typeof t3 !== "number")
-            return H.iae(t3);
-          if (t2 > t3)
-            t1.pop();
-          t1 = this._headAngle;
-          if (typeof t1 !== "number")
-            return t1.$mul();
-          t1 = t1 * 3.141592653589793 / 180;
-          t2 = Math.cos(t1);
-          t1 = Math.sin(t1);
-          t3 = this._moveSpeed;
-          if (typeof t3 !== "number")
-            return t3.$mul();
-          offset = new P.Point(t2, t1, [null]).$mul(0, t3 * diff / 1000);
-          t3 = this._headPosition.$add(0, offset);
-          this._headPosition = t3;
-          t1 = t3.x;
-          if (!(t1 < 0))
-            if (!(t3.y < 0)) {
-              t2 = J.get$width$x($.canvas);
-              if (typeof t2 !== "number")
-                return H.iae(t2);
-              if (!(t1 >= t2)) {
-                t1 = this._headPosition.y;
-                t2 = J.get$height$x($.canvas);
-                if (typeof t2 !== "number")
-                  return H.iae(t2);
-                t1 = t1 >= t2 || this._isSnakeSelfColliding$0();
-              } else
-                t1 = true;
-            } else
-              t1 = true;
-          else
-            t1 = true;
-          if (t1)
-            this.init$0();
-          else if (this._headPosition.squaredDistanceTo$1(this._foodPosition) <= 100) {
-            t1 = this._bodyLength;
-            if (typeof t1 !== "number")
-              return t1.$add();
-            this._bodyLength = t1 + 50;
-            this._foodPosition = G.randomPoint(J.get$width$x($.canvas), J.get$height$x($.canvas));
-          }
-          this._needsDraw = true;
-        }
+        this._update$1(delta);
         if (this._needsDraw === true) {
           this._draw$0();
           this._needsDraw = false;
         }
         C.Window_methods.get$animationFrame(window).then$1(this.get$_onFrame());
       }, "call$1", "get$_onFrame", 2, 0, 13],
+      _update$1: function(timestamp) {
+        var t1, t2, tickNum, inputDirection, t3, t4, t5, t6;
+        for (t1 = [null], t2 = J.getInterceptor$n(timestamp), tickNum = 0; tickNum < 12; ++tickNum) {
+          if (J.$lt$n(t2.$sub(timestamp, this._lastTimeStamp), 8.333333333333334))
+            break;
+          inputDirection = $.$get$keyboard()._keys.containsKey$1(37) ? -1 : 0;
+          if ($.$get$keyboard()._keys.containsKey$1(39))
+            ++inputDirection;
+          t3 = this._headAngle;
+          t4 = this._rotateSpeed;
+          if (typeof t4 !== "number")
+            return H.iae(t4);
+          if (typeof t3 !== "number")
+            return t3.$add();
+          t4 = t3 + inputDirection * t4 * 8.333333333333334 / 1000;
+          this._headAngle = t4;
+          this._headAngle = C.JSNumber_methods.$mod(t4, 360);
+          t4 = this._bodyPoints;
+          (t4 && C.JSArray_methods).insert$2(t4, 0, this._headPosition);
+          t3 = this._bodyPoints;
+          t4 = t3.length;
+          t5 = this._bodyLength;
+          if (typeof t5 !== "number")
+            return H.iae(t5);
+          if (t4 > t5)
+            t3.pop();
+          t3 = this._headAngle;
+          if (typeof t3 !== "number")
+            return t3.$mul();
+          t3 = t3 * 3.141592653589793 / 180;
+          t4 = Math.cos(t3);
+          t3 = Math.sin(t3);
+          t5 = this._moveSpeed;
+          if (typeof t5 !== "number")
+            return t5.$mul();
+          t5 = t5 * 8.333333333333334 / 1000;
+          t6 = this._headPosition;
+          t4 = t6.x + t4 * t5;
+          t5 = t6.y + t3 * t5;
+          this._headPosition = new P.Point(t4, t5, [H.getTypeArgumentByIndex(t6, 0)]);
+          if (!(t4 < 0))
+            if (!(t5 < 0)) {
+              t3 = J.get$width$x($.canvas);
+              if (typeof t3 !== "number")
+                return H.iae(t3);
+              if (!(t4 >= t3)) {
+                t3 = this._headPosition.y;
+                t4 = J.get$height$x($.canvas);
+                if (typeof t4 !== "number")
+                  return H.iae(t4);
+                t3 = t3 >= t4 || this._isSnakeSelfColliding$0();
+              } else
+                t3 = true;
+            } else
+              t3 = true;
+          else
+            t3 = true;
+          if (t3)
+            this.init$0();
+          else if (this._headPosition.squaredDistanceTo$1(this._foodPosition) <= 100) {
+            t3 = this._bodyLength;
+            if (typeof t3 !== "number")
+              return t3.$add();
+            this._bodyLength = t3 + 50;
+            t3 = J.get$width$x($.canvas);
+            t4 = J.get$height$x($.canvas);
+            t5 = C.C__JSRandom.nextDouble$0();
+            if (typeof t3 !== "number")
+              return H.iae(t3);
+            t6 = C.C__JSRandom.nextDouble$0();
+            if (typeof t4 !== "number")
+              return H.iae(t4);
+            this._foodPosition = new P.Point(t5 * t3, t6 * t4, t1);
+          }
+          this._needsDraw = true;
+          this._lastTimeStamp = J.$add$ns(this._lastTimeStamp, 8.333333333333334);
+        }
+        if (tickNum >= 12)
+          this._lastTimeStamp = timestamp;
+      },
       _isSnakeSelfColliding$0: function() {
         var t1, v, i, s1, s2;
         if (this._bodyPoints.length < 2)
@@ -7118,11 +7144,6 @@
       return receiver + a0;
     return J.getInterceptor$ns(receiver).$add(receiver, a0);
   };
-  J.$gt$n = function(receiver, a0) {
-    if (typeof receiver == "number" && typeof a0 == "number")
-      return receiver > a0;
-    return J.getInterceptor$n(receiver).$gt(receiver, a0);
-  };
   J.$index$asx = function(receiver, a0) {
     if (typeof a0 === "number")
       if (receiver.constructor == Array || typeof receiver == "string" || H.isJsIndexable(receiver, receiver[init.dispatchPropertyName]))
@@ -7134,11 +7155,6 @@
     if (typeof receiver == "number" && typeof a0 == "number")
       return receiver < a0;
     return J.getInterceptor$n(receiver).$lt(receiver, a0);
-  };
-  J.$sub$n = function(receiver, a0) {
-    if (typeof receiver == "number" && typeof a0 == "number")
-      return receiver - a0;
-    return J.getInterceptor$n(receiver).$sub(receiver, a0);
   };
   J._addEventListener$3$x = function(receiver, a0, a1, a2) {
     return J.getInterceptor$x(receiver)._addEventListener$3(receiver, a0, a1, a2);

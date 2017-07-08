@@ -6882,8 +6882,8 @@
         for (t1 = [null], t2 = J.getInterceptor$n(timestamp), tickNum = 0; tickNum < 12; ++tickNum) {
           if (J.$lt$n(t2.$sub(timestamp, this._lastTimeStamp), 8.333333333333334))
             break;
-          inputDirection = $.$get$keyboard()._keys.containsKey$1(37) ? -1 : 0;
-          if ($.$get$keyboard()._keys.containsKey$1(39))
+          inputDirection = $.$get$keyboard()._keys.containsKey$1(37) || $.$get$keyboard()._keys.containsKey$1(65) ? -1 : 0;
+          if ($.$get$keyboard()._keys.containsKey$1(39) || $.$get$keyboard()._keys.containsKey$1(68))
             ++inputDirection;
           t3 = this._headAngle;
           t4 = this._rotateSpeed;

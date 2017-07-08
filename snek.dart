@@ -219,10 +219,10 @@ class Game {
   void _tick(num delta) {
     // rotate snake head
     num inputDirection = 0;
-    if (keyboard.isPressed(KeyCode.LEFT)) {
+    if (keyboard.isPressed(KeyCode.LEFT) || keyboard.isPressed(KeyCode.A)) {
       inputDirection -= 1;
     }
-    if (keyboard.isPressed(KeyCode.RIGHT)) {
+    if (keyboard.isPressed(KeyCode.RIGHT) || keyboard.isPressed(KeyCode.D)) {
       inputDirection += 1;
     }
     _headAngle += inputDirection * _rotateSpeed * delta / 1000;

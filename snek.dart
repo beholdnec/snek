@@ -3,17 +3,32 @@ import 'dart:math';
 import 'dart:collection';
 
 CanvasElement canvas;
+num virtualWidth = 300;
+num virtualHeight = 300;
+num dpiScaling = 1;
 CanvasRenderingContext2D ctx;
 Keyboard keyboard = new Keyboard();
 
 void main() {
   canvas = querySelector('#canvas');
+  virtualWidth = canvas.width;
+  virtualHeight = canvas.height;
+
+  // apply DPI scaling so game looks sharp on high-dpi screens.
+  dpiScaling = window.devicePixelRatio;
+  canvas.width = virtualWidth * dpiScaling;
+  canvas.height = virtualHeight * dpiScaling;
+
   ctx = canvas.getContext('2d');
 
   new Game()..run();
 }
 
 void clear() {
+  // this clears canvas and resets all canvas state
+  canvas.width = canvas.width;
+
+  // fill background with solid white
   ctx..fillStyle = 'white'
     ..fillRect(0, 0, canvas.width, canvas.height);
 }
@@ -164,7 +179,7 @@ class Game {
   }
 
   void init() {
-    _headPosition = new Point(canvas.width / 2, canvas.height / 2);
+    _headPosition = new Point(virtualWidth / 2, virtualHeight / 2);
     _headAngle = 0;
     _moveSpeed = 100;
     _rotateSpeed = 360;
@@ -177,7 +192,7 @@ class Game {
   }
 
   void _placeFood() {
-    _foodPosition = randomPoint(canvas.width, canvas.height);
+    _foodPosition = randomPoint(virtualWidth, virtualHeight);
   }
 
   void run() {
@@ -242,7 +257,7 @@ class Game {
 
     // check for wall  or body collision
     if (_headPosition.x < 0 || _headPosition.y < 0 ||
-      _headPosition.x >= canvas.width || _headPosition.y >= canvas.height ||
+      _headPosition.x >= virtualWidth || _headPosition.y >= virtualHeight ||
       _isSnakeSelfColliding()) {
       // out of bounds; reset the game
       // TODO: carefully ensure game state is cleaned up and reset; abort
@@ -281,7 +296,10 @@ class Game {
   }
 
   void _draw() {
+    // clear will reset all drawing state, including transforms, styles, etc.
     clear();
+
+    ctx..scale(dpiScaling, dpiScaling);
 
     // draw food (mouse)
     ctx..fillStyle = 'black'
@@ -326,25 +344,5 @@ class Game {
       ..ellipse(rightEyePosition.x, rightEyePosition.y, EYE_LENGTH/2, EYE_WIDTH/2,
         headAngleRads, 0, 2 * PI, true)
       ..fill();
-
-    // draw text for testing
-    // Point p = _headPosition;
-    // Point s1 = new Point(canvas.width / 4, canvas.height / 4);
-    // Point s2 = new Point(canvas.width * 3/4, canvas.height * 3/4);
-    // ctx..strokeStyle = 'black'
-    //   ..lineWidth = 1
-    //   ..beginPath()
-    //   ..moveTo(s1.x, s1.y)..lineTo(s2.x, s2.y)
-    //   ..stroke();
-    // double testDist = sqrt(squaredDistancePointToLineSegment(_headPosition, s1, s2));
-    // final bool willCollide_ = willCollide(_headPosition, pointAtAngle(_headAngle * PI / 180),
-    //   s1, s2);
-    // final bool isColliding = willCollide_ && testDist < 8;
-    // ctx..textAlign = 'left'
-    //   ..textBaseline = 'top'
-    //   ..fillText('Distance to diagonal: ' + testDist.toString(), 0, 0)
-    //   ..fillText('Will collide: ' + willCollide_.toString(), 0, 16)
-    //   ..fillText('Is colliding: ' + isColliding.toString(), 0, 32)
-    //   ..fillText('Is snake self-colliding: ' + _isSnakeSelfColliding().toString(), 0, 48);
   }
 }

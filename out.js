@@ -776,6 +776,11 @@
           throw H.wrapException(H.argumentErrorValue(other));
         return receiver - other;
       },
+      $mul: function(receiver, other) {
+        if (typeof other !== "number")
+          throw H.wrapException(H.argumentErrorValue(other));
+        return receiver * other;
+      },
       $mod: function(receiver, other) {
         var result = receiver % other;
         if (result === 0)
@@ -855,6 +860,26 @@
       },
       substring$1: function($receiver, startIndex) {
         return this.substring$2($receiver, startIndex, null);
+      },
+      $mul: function(receiver, times) {
+        var s, result;
+        if (typeof times !== "number")
+          return H.iae(times);
+        if (0 >= times)
+          return "";
+        if (times === 1 || receiver.length === 0)
+          return receiver;
+        if (times !== times >>> 0)
+          throw H.wrapException(C.C_OutOfMemoryError);
+        for (s = receiver, result = ""; true;) {
+          if ((times & 1) === 1)
+            result = s + result;
+          times = times >>> 1;
+          if (times === 0)
+            break;
+          s += s;
+        }
+        return result;
       },
       toString$0: function(receiver) {
         return receiver;
@@ -6019,6 +6044,16 @@
         return "Concurrent modification during iteration: " + H.S(P.Error_safeToString(t1)) + ".";
       }
     },
+    OutOfMemoryError: {
+      "^": "Object;",
+      toString$0: function(_) {
+        return "Out of Memory";
+      },
+      get$stackTrace: function() {
+        return;
+      },
+      $isError: 1
+    },
     StackOverflowError: {
       "^": "Object;",
       toString$0: function(_) {
@@ -6221,7 +6256,7 @@
       "%": "HTMLBodyElement"
     },
     CanvasElement: {
-      "^": "HtmlElement;height=,width=",
+      "^": "HtmlElement;height%,width%",
       getContext$2: function(receiver, contextId, attributes) {
         return receiver.getContext(contextId);
       },
@@ -6232,6 +6267,9 @@
     },
     CanvasRenderingContext2D: {
       "^": "Interceptor;fillStyle},strokeStyle}",
+      scale$2: function(receiver, x, y) {
+        return receiver.scale(x, y);
+      },
       stroke$1: function(receiver, path) {
         return receiver.stroke(path);
       },
@@ -6271,7 +6309,7 @@
       "%": ";Element"
     },
     EmbedElement: {
-      "^": "HtmlElement;height=,width=",
+      "^": "HtmlElement;height%,width%",
       "%": "HTMLEmbedElement"
     },
     ErrorEvent: {
@@ -6297,15 +6335,15 @@
       "%": "HTMLFormElement"
     },
     IFrameElement: {
-      "^": "HtmlElement;height=,width=",
+      "^": "HtmlElement;height%,width%",
       "%": "HTMLIFrameElement"
     },
     ImageElement: {
-      "^": "HtmlElement;height=,width=",
+      "^": "HtmlElement;height%,width%",
       "%": "HTMLImageElement"
     },
     InputElement: {
-      "^": "HtmlElement;height=,width=",
+      "^": "HtmlElement;height%,width%",
       $isInterceptor: 1,
       "%": "HTMLInputElement"
     },
@@ -6333,7 +6371,7 @@
       "%": "Document|HTMLDocument;Node"
     },
     ObjectElement: {
-      "^": "HtmlElement;height=,width=",
+      "^": "HtmlElement;height%,width%",
       "%": "HTMLObjectElement"
     },
     SelectElement: {
@@ -6349,7 +6387,7 @@
       "%": "CompositionEvent|DragEvent|FocusEvent|MouseEvent|PointerEvent|SVGZoomEvent|TextEvent|TouchEvent|WheelEvent;UIEvent"
     },
     VideoElement: {
-      "^": "MediaElement;height=,width=",
+      "^": "MediaElement;height%,width%",
       "%": "HTMLVideoElement"
     },
     Window: {
@@ -6756,7 +6794,13 @@
     main: [function() {
       var t1 = document.querySelector("#canvas");
       $.canvas = t1;
-      $.ctx = J.getContext$1$x(t1, "2d");
+      $.virtualWidth = J.get$width$x(t1);
+      $.virtualHeight = J.get$height$x($.canvas);
+      t1 = window.devicePixelRatio;
+      $.dpiScaling = t1;
+      J.set$width$x($.canvas, J.$mul$ns($.virtualWidth, t1));
+      J.set$height$x($.canvas, J.$mul$ns($.virtualHeight, $.dpiScaling));
+      $.ctx = J.getContext$1$x($.canvas, "2d");
       t1 = new G.Game(0, null, null, null, null, null, null, null, null);
       t1.init$0();
       C.Window_methods.get$animationFrame(window).then$1(t1.get$_onFrame());
@@ -6850,10 +6894,10 @@
       "^": "Object;_lastTimeStamp,_needsDraw,_headPosition,_headAngle,_bodyLength,_bodyPoints,_moveSpeed,_rotateSpeed,_foodPosition",
       init$0: function() {
         var t1, t2;
-        t1 = J.get$width$x($.canvas);
+        t1 = $.virtualWidth;
         if (typeof t1 !== "number")
           return t1.$div();
-        t2 = J.get$height$x($.canvas);
+        t2 = $.virtualHeight;
         if (typeof t2 !== "number")
           return t2.$div();
         t2 = new P.Point(t1 / 2, t2 / 2, [null]);
@@ -6865,7 +6909,7 @@
         t1 = [];
         this._bodyPoints = t1;
         C.JSArray_methods.insert$2(t1, 0, t2);
-        this._foodPosition = G.randomPoint(J.get$width$x($.canvas), J.get$height$x($.canvas));
+        this._foodPosition = G.randomPoint($.virtualWidth, $.virtualHeight);
         this._needsDraw = true;
         this._lastTimeStamp = window.performance.now();
       },
@@ -6919,15 +6963,14 @@
           this._headPosition = new P.Point(t4, t5, [H.getTypeArgumentByIndex(t6, 0)]);
           if (!(t4 < 0))
             if (!(t5 < 0)) {
-              t3 = J.get$width$x($.canvas);
+              t3 = $.virtualWidth;
               if (typeof t3 !== "number")
                 return H.iae(t3);
               if (!(t4 >= t3)) {
-                t3 = this._headPosition.y;
-                t4 = J.get$height$x($.canvas);
-                if (typeof t4 !== "number")
-                  return H.iae(t4);
-                t3 = t3 >= t4 || this._isSnakeSelfColliding$0();
+                t3 = $.virtualHeight;
+                if (typeof t3 !== "number")
+                  return H.iae(t3);
+                t3 = t5 >= t3 || this._isSnakeSelfColliding$0();
               } else
                 t3 = true;
             } else
@@ -6941,8 +6984,8 @@
             if (typeof t3 !== "number")
               return t3.$add();
             this._bodyLength = t3 + 50;
-            t3 = J.get$width$x($.canvas);
-            t4 = J.get$height$x($.canvas);
+            t3 = $.virtualWidth;
+            t4 = $.virtualHeight;
             t5 = C.C__JSRandom.nextDouble$0();
             if (typeof t3 !== "number")
               return H.iae(t3);
@@ -6977,24 +7020,30 @@
       },
       _draw$0: function() {
         var t1, t2, _i, pt, headAngleRads, angleVectorNormal, leftEyePosition, rightEyePosition;
+        t1 = $.canvas;
+        t2 = J.getInterceptor$x(t1);
+        t2.set$width(t1, t2.get$width(t1));
         t1 = $.ctx;
         J.set$fillStyle$x(t1, "white");
         t1.fillRect(0, 0, J.get$width$x($.canvas), J.get$height$x($.canvas));
         t1 = $.ctx;
-        J.getInterceptor$x(t1).set$fillStyle(t1, "black");
-        t1.font = "16px sans-serif";
-        t1.textAlign = "center";
-        t1.textBaseline = "middle";
-        t2 = this._foodPosition;
-        C.CanvasRenderingContext2D_methods.fillText$3(t1, "\ud83d\udc01", t2.x, t2.y);
+        t2 = $.dpiScaling;
+        J.scale$2$x(t1, t2, t2);
         t2 = $.ctx;
-        J.set$strokeStyle$x(t2, "LimeGreen");
-        t2.lineWidth = 8;
-        t2.lineCap = "round";
-        t2.lineJoin = "round";
-        t2.beginPath();
-        t1 = this._headPosition;
-        t2.moveTo(t1.x, t1.y);
+        J.getInterceptor$x(t2).set$fillStyle(t2, "black");
+        t2.font = "16px sans-serif";
+        t2.textAlign = "center";
+        t2.textBaseline = "middle";
+        t1 = this._foodPosition;
+        C.CanvasRenderingContext2D_methods.fillText$3(t2, "\ud83d\udc01", t1.x, t1.y);
+        t1 = $.ctx;
+        J.set$strokeStyle$x(t1, "LimeGreen");
+        t1.lineWidth = 8;
+        t1.lineCap = "round";
+        t1.lineJoin = "round";
+        t1.beginPath();
+        t2 = this._headPosition;
+        t1.moveTo(t2.x, t2.y);
         for (t1 = this._bodyPoints, t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i) {
           pt = t1[_i];
           J.lineTo$2$x($.ctx, pt.x, pt.y);
@@ -7115,8 +7164,14 @@
   J.set$fillStyle$x = function(receiver, value) {
     return J.getInterceptor$x(receiver).set$fillStyle(receiver, value);
   };
+  J.set$height$x = function(receiver, value) {
+    return J.getInterceptor$x(receiver).set$height(receiver, value);
+  };
   J.set$strokeStyle$x = function(receiver, value) {
     return J.getInterceptor$x(receiver).set$strokeStyle(receiver, value);
+  };
+  J.set$width$x = function(receiver, value) {
+    return J.getInterceptor$x(receiver).set$width(receiver, value);
   };
   J.get$error$x = function(receiver) {
     return J.getInterceptor$x(receiver).get$error(receiver);
@@ -7156,6 +7211,11 @@
       return receiver < a0;
     return J.getInterceptor$n(receiver).$lt(receiver, a0);
   };
+  J.$mul$ns = function(receiver, a0) {
+    if (typeof receiver == "number" && typeof a0 == "number")
+      return receiver * a0;
+    return J.getInterceptor$ns(receiver).$mul(receiver, a0);
+  };
   J._addEventListener$3$x = function(receiver, a0, a1, a2) {
     return J.getInterceptor$x(receiver)._addEventListener$3(receiver, a0, a1, a2);
   };
@@ -7173,6 +7233,9 @@
   };
   J.map$1$ax = function(receiver, a0) {
     return J.getInterceptor$ax(receiver).map$1(receiver, a0);
+  };
+  J.scale$2$x = function(receiver, a0, a1) {
+    return J.getInterceptor$x(receiver).scale$2(receiver, a0, a1);
   };
   J.stroke$0$x = function(receiver) {
     return J.getInterceptor$x(receiver).stroke$0(receiver);
@@ -7202,6 +7265,7 @@
   C.PlainJavaScriptObject_methods = J.PlainJavaScriptObject.prototype;
   C.UnknownJavaScriptObject_methods = J.UnknownJavaScriptObject.prototype;
   C.Window_methods = W.Window.prototype;
+  C.C_OutOfMemoryError = new P.OutOfMemoryError();
   C.C__DelayedDone = new P._DelayedDone();
   C.C__JSRandom = new P._JSRandom();
   C.C__RootZone = new P._RootZone();
@@ -7232,6 +7296,9 @@
   $.Zone__current = C.C__RootZone;
   $.Expando__keyCount = 0;
   $.canvas = null;
+  $.virtualWidth = 300;
+  $.virtualHeight = 300;
+  $.dpiScaling = 1;
   $.ctx = null;
   $ = null;
   init.isHunkLoaded = function(hunkHash) {

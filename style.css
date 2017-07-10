@@ -5,8 +5,6 @@ p, h1, h2, h3 {
 }
 
 #wrapper {
-  width: 300px;
-  height: 300px;
   margin: auto;
   border: solid thin black;
 }

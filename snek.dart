@@ -45,9 +45,48 @@ Point pointAtAngle(num angle) {
   return new Point(cos(angle), sin(angle));
 }
 
-Point randomPoint(num maxX, num maxY) {
+double randomBetween(double lo, double hi) {
   Random r = new Random();
-  return new Point(r.nextDouble() * maxX, r.nextDouble() * maxY);
+  return lo + r.nextDouble() * (hi - lo);
+}
+
+Point randomPoint(Rectangle rect) {
+  Random r = new Random();
+  return new Point(rect.left + r.nextDouble() * rect.width,
+    rect.top + r.nextDouble() * rect.height);
+}
+
+// tongue-blep animation controller
+class BlepAnimationController {
+  BlepAnimationController(double totalTime) {
+    _currentTime = 0.0;
+    _totalTime = totalTime;
+  }
+
+  void advance(double delta) {
+    _currentTime += delta;
+    if (_currentTime > _totalTime) {
+      _currentTime = _totalTime;
+    }
+  }
+
+  // BlepAnimationController provides this value to users.
+  // Value goes up to 1.0 during the first half of total time, then it comes
+  // back down.
+  double get value {
+    if (_currentTime < _totalTime / 2) {
+      return _currentTime / (_totalTime / 2);
+    } else {
+      return (_totalTime - _currentTime) / (_totalTime / 2);
+    }
+  }
+
+  bool get done {
+    return _currentTime >= _totalTime;
+  }
+
+  double _currentTime;
+  double _totalTime;
 }
 
 // Return squared distance from point p to line segment s1 -> s2. The squared
@@ -156,6 +195,19 @@ class Game {
   static const num EYE_WIDTH = 3;
   static const String BODY_STROKE_STYLE = 'LimeGreen';
   static const num BODY_WIDTH = 8;
+  static const String TONGUE_STROKE_STYLE = 'Red';
+  static const num TONGUE_WIDTH = 2;
+  static const int MAX_TONGUE_POINTS = 32;
+  static const num TONGUE_LENGTH = 24;
+  static const num TONGUE_SIDE_DISPLACEMENT = 2;
+
+  // constants for animation
+  static const num MIN_BLEP_DELAY_MS = 1000.0;
+  static const num MAX_BLEP_DELAY_MS = 2000.0;
+  static const num MIN_BLEP_TIME_MS = 200.0;
+  static const num MAX_BLEP_TIME_MS = 750.0;
+  static const num MIN_BLEP_SQUIGGLE = 0.5;
+  static const num MAX_BLEP_SQUIGGLE = 3.0;
 
   num _lastTimeStamp = 0;
   // if true, draw the canvas
@@ -173,6 +225,12 @@ class Game {
   // speed of rotation in degrees per second
   num _rotateSpeed;
   Point _foodPosition;
+  // delay until blep
+  double _blepDelay;
+  // amount tongue squiggles when blepping
+  double _blepSquiggle;
+  // blep controller
+  BlepAnimationController _blep = null;
 
   Game() {
     init();
@@ -187,12 +245,28 @@ class Game {
     _bodyPoints = new List();
     _bodyPoints.insert(0, _headPosition);
     _placeFood();
+    _startBlepDelay();
     _needsDraw = true;
     _lastTimeStamp = window.performance.now();
   }
 
+  void _startBlepDelay() {
+    _blepDelay = randomBetween(MIN_BLEP_DELAY_MS, MAX_BLEP_DELAY_MS);
+    _blep = null;
+  }
+
+  void _triggerBlep() {
+    _blepDelay = 0.0;
+    _blepSquiggle = randomBetween(MIN_BLEP_SQUIGGLE, MAX_BLEP_SQUIGGLE);
+    final double blepTime = randomBetween(MIN_BLEP_TIME_MS, MAX_BLEP_TIME_MS);
+    _blep = new BlepAnimationController(blepTime);
+  }
+
   void _placeFood() {
-    _foodPosition = randomPoint(virtualWidth, virtualHeight);
+    Rectangle foodArea = new Rectangle.fromPoints(
+      new Point(virtualWidth * 1/16, virtualHeight * 1/16),
+      new Point(virtualWidth * 15/16, virtualHeight * 15/16));
+    _foodPosition = randomPoint(foodArea);
   }
 
   void run() {
@@ -242,6 +316,19 @@ class Game {
     }
     _headAngle += inputDirection * _rotateSpeed * delta / 1000;
     _headAngle %= 360;
+
+    // drive tongue-blep animation
+    if (_blepDelay > 0) {
+      _blepDelay -= delta;
+      if (_blepDelay <= 0) {
+        _triggerBlep();
+      }
+    } else {
+      _blep.advance(delta);
+      if (_blep.done) {
+        _startBlepDelay();
+      }
+    }
 
     // add new body point at head
     // Dart doesn't store a reference to _headPosition; instead, _headPosition
@@ -324,6 +411,23 @@ class Game {
     double headAngleRads = _headAngle * PI / 180;
     Point angleVector = new Point(cos(headAngleRads), sin(headAngleRads));
     Point angleVectorNormal = new Point(-angleVector.y, angleVector.x);
+
+    // draw snake tongue
+    if (_blep != null) {
+      ctx..strokeStyle = TONGUE_STROKE_STYLE
+        ..lineWidth = TONGUE_WIDTH
+        ..beginPath()
+        ..moveTo(_headPosition.x, _headPosition.y);
+      final int numTonguePoints = (_blep.value * MAX_TONGUE_POINTS).toInt();
+      for (int i = 0; i < numTonguePoints; ++i) {
+        Point pt = _headPosition + angleVector * (HEAD_LENGTH / 2) +
+          angleVector * (TONGUE_LENGTH * i / MAX_TONGUE_POINTS) +
+          angleVectorNormal * TONGUE_SIDE_DISPLACEMENT *
+            sin(_blepSquiggle * 2.0 * PI * i / MAX_TONGUE_POINTS);
+        ctx..lineTo(pt.x, pt.y);
+      }
+      ctx..stroke();
+    }
 
     // draw snake head
     ctx..fillStyle = HEAD_FILL_STYLE

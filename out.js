@@ -757,6 +757,16 @@
     },
     JSNumber: {
       "^": "Interceptor;",
+      toInt$0: function(receiver) {
+        var t1;
+        if (receiver >= -2147483648 && receiver <= 2147483647)
+          return receiver | 0;
+        if (isFinite(receiver)) {
+          t1 = receiver < 0 ? Math.ceil(receiver) : Math.floor(receiver);
+          return t1 + 0;
+        }
+        throw H.wrapException(new P.UnsupportedError("" + receiver + ".toInt()"));
+      },
       toString$0: function(receiver) {
         if (receiver === 0 && 1 / receiver < 0)
           return "-0.0";
@@ -6524,6 +6534,11 @@
       hash = 536870911 & hash + ((524287 & hash) << 10);
       return hash ^ hash >>> 6;
     },
+    _JenkinsSmiHash_finish: function(hash) {
+      hash = 536870911 & hash + ((67108863 & hash) << 3);
+      hash ^= hash >>> 11;
+      return 536870911 & hash + ((16383 & hash) << 15);
+    },
     _JSRandom: {
       "^": "Object;",
       nextDouble$0: function() {
@@ -6543,11 +6558,7 @@
         return this.x === other.x && this.y === other.y;
       },
       get$hashCode: function(_) {
-        var t1, hash;
-        t1 = P._JenkinsSmiHash_combine(P._JenkinsSmiHash_combine(0, this.x & 0x1FFFFFFF), this.y & 0x1FFFFFFF);
-        hash = 536870911 & t1 + ((67108863 & t1) << 3);
-        hash ^= hash >>> 11;
-        return 536870911 & hash + ((16383 & hash) << 15);
+        return P._JenkinsSmiHash_finish(P._JenkinsSmiHash_combine(P._JenkinsSmiHash_combine(0, this.x & 0x1FFFFFFF), this.y & 0x1FFFFFFF));
       },
       $add: function(_, other) {
         return new P.Point(this.x + J.get$x$x(other), this.y + other.y, this.$ti);
@@ -6801,19 +6812,12 @@
       J.set$width$x($.canvas, J.$mul$ns($.virtualWidth, t1));
       J.set$height$x($.canvas, J.$mul$ns($.virtualHeight, $.dpiScaling));
       $.ctx = J.getContext$1$x($.canvas, "2d");
-      t1 = new G.Game(0, null, null, null, null, null, null, null, null);
+      t1 = new G.Game(0, null, null, null, null, null, null, null, null, null, null, null);
       t1.init$0();
       C.Window_methods.get$animationFrame(window).then$1(t1.get$_onFrame());
     }, "call$0", "snek__main$closure", 0, 0, 1],
-    randomPoint: function(maxX, maxY) {
-      var t1, t2;
-      t1 = C.C__JSRandom.nextDouble$0();
-      if (typeof maxX !== "number")
-        return H.iae(maxX);
-      t2 = C.C__JSRandom.nextDouble$0();
-      if (typeof maxY !== "number")
-        return H.iae(maxY);
-      return new P.Point(t1 * maxX, t2 * maxY, [null]);
+    randomBetween: function(lo, hi) {
+      return lo + C.C__JSRandom.nextDouble$0() * (hi - lo);
     },
     squaredDistancePointToLineSegment: function(p, s1, s2) {
       var s1s2SquaredDistance, t1, t2, t3, t4, u;
@@ -6861,6 +6865,19 @@
       t8 = (t1 * t3 + t4 * t6) / s1s2SquaredDistance;
       return (t3 * t8 - t1) * (t2 + t3 * u - t7) + (t6 * t8 - t4) * (t5 + t6 * u - t9) < 0;
     },
+    BlepAnimationController: {
+      "^": "Object;_currentTime,_totalTime",
+      get$value: function(_) {
+        var t1, t2, t3;
+        t1 = this._currentTime;
+        t2 = this._totalTime;
+        t3 = t2 / 2;
+        if (t1 < t3)
+          return t1 / t3;
+        else
+          return (t2 - t1) / t3;
+      }
+    },
     Keyboard: {
       "^": "Object;_keys",
       Keyboard$0: function() {
@@ -6891,7 +6908,7 @@
       }
     },
     Game: {
-      "^": "Object;_lastTimeStamp,_needsDraw,_headPosition,_headAngle,_bodyLength,_bodyPoints,_moveSpeed,_rotateSpeed,_foodPosition",
+      "^": "Object;_lastTimeStamp,_needsDraw,_headPosition,_headAngle,_bodyLength,_bodyPoints,_moveSpeed,_rotateSpeed,_foodPosition,_blepDelay,_blepSquiggle,_blep",
       init$0: function() {
         var t1, t2;
         t1 = $.virtualWidth;
@@ -6909,9 +6926,40 @@
         t1 = [];
         this._bodyPoints = t1;
         C.JSArray_methods.insert$2(t1, 0, t2);
-        this._foodPosition = G.randomPoint($.virtualWidth, $.virtualHeight);
+        this._placeFood$0();
+        this._startBlepDelay$0();
         this._needsDraw = true;
         this._lastTimeStamp = window.performance.now();
+      },
+      _startBlepDelay$0: function() {
+        this._blepDelay = G.randomBetween(1000, 2000);
+        this._blep = null;
+      },
+      _placeFood$0: function() {
+        var t1, t2, t3, t4, left, width, $top, height;
+        t1 = J.$mul$ns($.virtualWidth, 1);
+        if (typeof t1 !== "number")
+          return t1.$div();
+        t1 /= 16;
+        t2 = J.$mul$ns($.virtualHeight, 1);
+        if (typeof t2 !== "number")
+          return t2.$div();
+        t2 /= 16;
+        t3 = J.$mul$ns($.virtualWidth, 15);
+        if (typeof t3 !== "number")
+          return t3.$div();
+        t3 /= 16;
+        t4 = J.$mul$ns($.virtualHeight, 15);
+        if (typeof t4 !== "number")
+          return t4.$div();
+        t4 /= 16;
+        left = Math.min(t1, t3);
+        width = Math.max(t1, t3) - left;
+        $top = Math.min(t2, t4);
+        height = Math.max(t2, t4) - $top;
+        t1 = width < 0 ? -width * 0 : width;
+        t2 = height < 0 ? -height * 0 : height;
+        this._foodPosition = new P.Point(left + C.C__JSRandom.nextDouble$0() * t1, $top + C.C__JSRandom.nextDouble$0() * t2, [null]);
       },
       _onFrame$1: [function(delta) {
         this._update$1(delta);
@@ -6922,77 +6970,98 @@
         C.Window_methods.get$animationFrame(window).then$1(this.get$_onFrame());
       }, "call$1", "get$_onFrame", 2, 0, 13],
       _update$1: function(timestamp) {
-        var t1, t2, tickNum, inputDirection, t3, t4, t5, t6;
-        for (t1 = [null], t2 = J.getInterceptor$n(timestamp), tickNum = 0; tickNum < 12; ++tickNum) {
-          if (J.$lt$n(t2.$sub(timestamp, this._lastTimeStamp), 8.333333333333334))
+        var t1, tickNum, inputDirection, t2, t3, t4, t5;
+        for (t1 = J.getInterceptor$n(timestamp), tickNum = 0; tickNum < 12; ++tickNum) {
+          if (J.$lt$n(t1.$sub(timestamp, this._lastTimeStamp), 8.333333333333334))
             break;
           inputDirection = $.$get$keyboard()._keys.containsKey$1(37) || $.$get$keyboard()._keys.containsKey$1(65) ? -1 : 0;
           if ($.$get$keyboard()._keys.containsKey$1(39) || $.$get$keyboard()._keys.containsKey$1(68))
             ++inputDirection;
-          t3 = this._headAngle;
-          t4 = this._rotateSpeed;
+          t2 = this._headAngle;
+          t3 = this._rotateSpeed;
+          if (typeof t3 !== "number")
+            return H.iae(t3);
+          if (typeof t2 !== "number")
+            return t2.$add();
+          t3 = t2 + inputDirection * t3 * 8.333333333333334 / 1000;
+          this._headAngle = t3;
+          this._headAngle = C.JSNumber_methods.$mod(t3, 360);
+          t2 = this._blepDelay;
+          if (typeof t2 !== "number")
+            return t2.$gt();
+          if (t2 > 0) {
+            t2 -= 8.333333333333334;
+            this._blepDelay = t2;
+            if (t2 <= 0) {
+              this._blepDelay = 0;
+              this._blepSquiggle = 0.5 + C.C__JSRandom.nextDouble$0() * 2.5;
+              t2 = C.C__JSRandom.nextDouble$0();
+              t3 = new G.BlepAnimationController(null, null);
+              t3._currentTime = 0;
+              t3._totalTime = 200 + t2 * 550;
+              this._blep = t3;
+            }
+          } else {
+            t2 = this._blep;
+            t3 = t2._currentTime += 8.333333333333334;
+            t4 = t2._totalTime;
+            if (t3 > t4) {
+              t2._currentTime = t4;
+              t2 = t4;
+            } else
+              t2 = t3;
+            if (t2 >= t4) {
+              this._blepDelay = 1000 + C.C__JSRandom.nextDouble$0() * 1000;
+              this._blep = null;
+            }
+          }
+          t2 = this._bodyPoints;
+          (t2 && C.JSArray_methods).insert$2(t2, 0, this._headPosition);
+          t2 = this._bodyPoints;
+          t3 = t2.length;
+          t4 = this._bodyLength;
           if (typeof t4 !== "number")
             return H.iae(t4);
-          if (typeof t3 !== "number")
-            return t3.$add();
-          t4 = t3 + inputDirection * t4 * 8.333333333333334 / 1000;
-          this._headAngle = t4;
-          this._headAngle = C.JSNumber_methods.$mod(t4, 360);
-          t4 = this._bodyPoints;
-          (t4 && C.JSArray_methods).insert$2(t4, 0, this._headPosition);
-          t3 = this._bodyPoints;
-          t4 = t3.length;
-          t5 = this._bodyLength;
-          if (typeof t5 !== "number")
-            return H.iae(t5);
-          if (t4 > t5)
-            t3.pop();
-          t3 = this._headAngle;
-          if (typeof t3 !== "number")
-            return t3.$mul();
-          t3 = t3 * 3.141592653589793 / 180;
-          t4 = Math.cos(t3);
-          t3 = Math.sin(t3);
-          t5 = this._moveSpeed;
-          if (typeof t5 !== "number")
-            return t5.$mul();
-          t5 = t5 * 8.333333333333334 / 1000;
-          t6 = this._headPosition;
-          t4 = t6.x + t4 * t5;
-          t5 = t6.y + t3 * t5;
-          this._headPosition = new P.Point(t4, t5, [H.getTypeArgumentByIndex(t6, 0)]);
-          if (!(t4 < 0))
-            if (!(t5 < 0)) {
-              t3 = $.virtualWidth;
-              if (typeof t3 !== "number")
-                return H.iae(t3);
-              if (!(t4 >= t3)) {
-                t3 = $.virtualHeight;
-                if (typeof t3 !== "number")
-                  return H.iae(t3);
-                t3 = t5 >= t3 || this._isSnakeSelfColliding$0();
+          if (t3 > t4)
+            t2.pop();
+          t2 = this._headAngle;
+          if (typeof t2 !== "number")
+            return t2.$mul();
+          t2 = t2 * 3.141592653589793 / 180;
+          t3 = Math.cos(t2);
+          t2 = Math.sin(t2);
+          t4 = this._moveSpeed;
+          if (typeof t4 !== "number")
+            return t4.$mul();
+          t4 = t4 * 8.333333333333334 / 1000;
+          t5 = this._headPosition;
+          t3 = t5.x + t3 * t4;
+          t4 = t5.y + t2 * t4;
+          this._headPosition = new P.Point(t3, t4, [H.getTypeArgumentByIndex(t5, 0)]);
+          if (!(t3 < 0))
+            if (!(t4 < 0)) {
+              t2 = $.virtualWidth;
+              if (typeof t2 !== "number")
+                return H.iae(t2);
+              if (!(t3 >= t2)) {
+                t2 = $.virtualHeight;
+                if (typeof t2 !== "number")
+                  return H.iae(t2);
+                t2 = t4 >= t2 || this._isSnakeSelfColliding$0();
               } else
-                t3 = true;
+                t2 = true;
             } else
-              t3 = true;
+              t2 = true;
           else
-            t3 = true;
-          if (t3)
+            t2 = true;
+          if (t2)
             this.init$0();
           else if (this._headPosition.squaredDistanceTo$1(this._foodPosition) <= 100) {
-            t3 = this._bodyLength;
-            if (typeof t3 !== "number")
-              return t3.$add();
-            this._bodyLength = t3 + 50;
-            t3 = $.virtualWidth;
-            t4 = $.virtualHeight;
-            t5 = C.C__JSRandom.nextDouble$0();
-            if (typeof t3 !== "number")
-              return H.iae(t3);
-            t6 = C.C__JSRandom.nextDouble$0();
-            if (typeof t4 !== "number")
-              return H.iae(t4);
-            this._foodPosition = new P.Point(t5 * t3, t6 * t4, t1);
+            t2 = this._bodyLength;
+            if (typeof t2 !== "number")
+              return t2.$add();
+            this._bodyLength = t2 + 50;
+            this._placeFood$0();
           }
           this._needsDraw = true;
           this._lastTimeStamp = J.$add$ns(this._lastTimeStamp, 8.333333333333334);
@@ -7019,7 +7088,7 @@
         return false;
       },
       _draw$0: function() {
-        var t1, t2, _i, pt, headAngleRads, angleVectorNormal, leftEyePosition, rightEyePosition;
+        var t1, t2, _i, pt, headAngleRads, t3, angleVectorNormal, t4, t5, numTonguePoints, t6, i, t7, t8, t9, t10, leftEyePosition, rightEyePosition;
         t1 = $.canvas;
         t2 = J.getInterceptor$x(t1);
         t2.set$width(t1, t2.get$width(t1));
@@ -7030,7 +7099,7 @@
         t2 = $.dpiScaling;
         J.scale$2$x(t1, t2, t2);
         t2 = $.ctx;
-        J.getInterceptor$x(t2).set$fillStyle(t2, "black");
+        J.set$fillStyle$x(t2, "black");
         t2.font = "16px sans-serif";
         t2.textAlign = "center";
         t2.textBaseline = "middle";
@@ -7054,9 +7123,33 @@
           return t1.$mul();
         headAngleRads = t1 * 3.141592653589793 / 180;
         t1 = Math.cos(headAngleRads);
-        angleVectorNormal = new P.Point(-Math.sin(headAngleRads), t1, [null]);
+        t2 = Math.sin(headAngleRads);
+        t3 = -t2;
+        angleVectorNormal = new P.Point(t3, t1, [null]);
+        if (this._blep != null) {
+          t4 = $.ctx;
+          J.set$strokeStyle$x(t4, "Red");
+          t4.lineWidth = 2;
+          t4.beginPath();
+          t5 = this._headPosition;
+          t4.moveTo(t5.x, t5.y);
+          t5 = this._blep;
+          numTonguePoints = C.JSNumber_methods.toInt$0(t5.get$value(t5) * 32);
+          for (t4 = t1 * 10, t5 = t2 * 10, t3 *= 2, t6 = t1 * 2, i = 0; i < numTonguePoints; ++i) {
+            t7 = this._headPosition;
+            t8 = t7.x;
+            t7 = t7.y;
+            t9 = 24 * i / 32;
+            t10 = this._blepSquiggle;
+            if (typeof t10 !== "number")
+              return t10.$mul();
+            t10 = Math.sin(t10 * 2 * 3.141592653589793 * i / 32);
+            J.lineTo$2$x($.ctx, t8 + t4 + t1 * t9 + t3 * t10, t7 + t5 + t2 * t9 + t6 * t10);
+          }
+          J.stroke$0$x($.ctx);
+        }
         t1 = $.ctx;
-        J.getInterceptor$x(t1).set$fillStyle(t1, "LimeGreen");
+        J.set$fillStyle$x(t1, "LimeGreen");
         t1.beginPath();
         t2 = this._headPosition;
         t1.ellipse(t2.x, t2.y, 10, 7, headAngleRads, 0, 6.283185307179586, true);
@@ -7064,7 +7157,7 @@
         leftEyePosition = this._headPosition.$add(0, angleVectorNormal.$mul(0, 7));
         rightEyePosition = this._headPosition.$sub(0, angleVectorNormal.$mul(0, 7));
         t1 = $.ctx;
-        J.getInterceptor$x(t1).set$fillStyle(t1, "Teal");
+        J.set$fillStyle$x(t1, "Teal");
         t1.beginPath();
         t1.ellipse(leftEyePosition.x, leftEyePosition.y, 3, 1.5, headAngleRads, 0, 6.283185307179586, true);
         C.CanvasRenderingContext2D_methods.fill$0(t1);
